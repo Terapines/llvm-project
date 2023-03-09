@@ -125,6 +125,9 @@ static const RISCVSupportedExtension SupportedExtensions[] = {
     {"xtheadsync", RISCVExtensionVersion{1, 0}},
     {"xtheadvdot", RISCVExtensionVersion{1, 0}},
     {"xventanacondops", RISCVExtensionVersion{1, 0}},
+
+    // We regard RVV0.71 as a custom extensions.
+    {"xv", RISCVExtensionVersion{0, 71}},
 };
 
 static const RISCVSupportedExtension SupportedExperimentalExtensions[] = {
@@ -872,6 +875,11 @@ Error RISCVISAInfo::checkDependency() {
   // Additional dependency checks.
   // TODO: The 'q' extension requires rv64.
   // TODO: It is illegal to specify 'e' extensions with 'f' and 'd'.
+
+  if (Exts.count("xv") && HasVector)
+    return createStringError(
+        errc::invalid_argument,
+        "xv requires v and zve* extension to be disabled.");
 
   return Error::success();
 }

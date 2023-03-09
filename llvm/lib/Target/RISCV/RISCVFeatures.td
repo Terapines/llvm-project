@@ -564,6 +564,17 @@ def HasVendorXTHeadVdot : Predicate<"Subtarget->hasVendorXTHeadVdot()">,
                                     "'xtheadvdot' (T-Head Vector Extensions for Dot)">;
 
 //===----------------------------------------------------------------------===//
+// RISC-V Vector Extension for 0.71 Version
+//===----------------------------------------------------------------------===//
+
+def FeatureRVV0p71
+    : SubtargetFeature<"xv", "HasRVV0p71", "true",
+                       "'Xv' (Vector Extension for 0.71 Version)">;
+def HasRVV0p71 : Predicate<"Subtarget->hasRVV0p71()">,
+                           AssemblerPredicate<(all_of FeatureRVV0p71),
+                           "'Xv' (Vector Extension for 0.71 Version)">;
+
+//===----------------------------------------------------------------------===//
 // LLVM specific features and extensions
 //===----------------------------------------------------------------------===//
 
