@@ -1688,6 +1688,7 @@ bool RISCVInstrInfo::verifyInstruction(const MachineInstr &MI,
           Ok = isUInt<10>(Imm);
           break;
         case RISCVOp::OPERAND_VTYPEI11:
+        case RISCVOp::OPERAND_VTYPEI0p71:
           Ok = isUInt<11>(Imm);
           break;
         case RISCVOp::OPERAND_SIMM12:

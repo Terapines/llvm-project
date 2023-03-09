@@ -169,6 +169,7 @@ class RISCVAsmParser : public MCTargetAsmParser {
   OperandMatchResultTy parsePseudoJumpSymbol(OperandVector &Operands);
   OperandMatchResultTy parseJALOffset(OperandVector &Operands);
   OperandMatchResultTy parseVTypeI(OperandVector &Operands);
+  OperandMatchResultTy parseVTypeI0p71(OperandVector &Operands);
   OperandMatchResultTy parseMaskReg(OperandVector &Operands);
   OperandMatchResultTy parseInsnDirectiveOpcode(OperandVector &Operands);
   OperandMatchResultTy parseGPRAsFPR(OperandVector &Operands);
@@ -276,6 +277,7 @@ struct RISCVOperand final : public MCParsedAsmOperand {
     Immediate,
     SystemRegister,
     VType,
+    VType0p71,
     FRM,
     Fence,
   } Kind;
@@ -342,6 +344,7 @@ public:
       SysReg = o.SysReg;
       break;
     case KindTy::VType:
+    case KindTy::VType0p71:
       VType = o.VType;
       break;
     case KindTy::FRM:
@@ -470,6 +473,11 @@ public:
     if (Kind == KindTy::Immediate)
       return isVTypeImm(11);
     return Kind == KindTy::VType;
+  }
+  bool isVTypeI0p71() const {
+    if (Kind == KindTy::Immediate)
+      return isVTypeImm(11);
+    return Kind == KindTy::VType0p71;
   }
 
   /// Return true if the operand is a valid for the fence instruction e.g.
@@ -799,7 +807,8 @@ public:
   }
 
   unsigned getVType() const {
-    assert(Kind == KindTy::VType && "Invalid type access!");
+    assert((Kind == KindTy::VType || Kind == KindTy::VType0p71) &&
+           "Invalid type access!");
     return VType.Val;
   }
 
@@ -837,6 +846,11 @@ public:
     case KindTy::VType:
       OS << "<vtype: ";
       RISCVVType::printVType(getVType(), OS);
+      OS << '>';
+      break;
+    case KindTy::VType0p71:
+      OS << "<vtype: ";
+      RISCVVType::printVType0p71(getVType(), OS);
       OS << '>';
       break;
     case KindTy::FRM:
@@ -910,6 +924,15 @@ public:
 
   static std::unique_ptr<RISCVOperand> createVType(unsigned VTypeI, SMLoc S) {
     auto Op = std::make_unique<RISCVOperand>(KindTy::VType);
+    Op->VType.Val = VTypeI;
+    Op->StartLoc = S;
+    Op->EndLoc = S;
+    return Op;
+  }
+
+  static std::unique_ptr<RISCVOperand> createVType0p71(unsigned VTypeI,
+                                                       SMLoc S) {
+    auto Op = std::make_unique<RISCVOperand>(KindTy::VType0p71);
     Op->VType.Val = VTypeI;
     Op->StartLoc = S;
     Op->EndLoc = S;
@@ -1073,9 +1096,10 @@ bool RISCVAsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
                                              bool MatchingInlineAsm) {
   MCInst Inst;
   FeatureBitset MissingFeatures;
+  bool IsRVV0p71 = getSTI().hasFeature(RISCV::FeatureRVV0p71);
 
   auto Result = MatchInstructionImpl(Operands, Inst, ErrorInfo, MissingFeatures,
-                                     MatchingInlineAsm);
+                                     MatchingInlineAsm, IsRVV0p71 ? 1 : 0);
   switch (Result) {
   default:
     break;
@@ -1272,6 +1296,13 @@ bool RISCVAsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
         ErrorLoc,
         "operand must be "
         "e[8|16|32|64|128|256|512|1024],m[1|2|4|8|f2|f4|f8],[ta|tu],[ma|mu]");
+  }
+  case Match_InvalidVTypeI0p71: {
+    SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(
+        ErrorLoc,
+        "operand must be "
+        "e[8|16|32|64|128|256|512|1024],m[1|2|4|8],d[1|2|4|8] for RVV0.71");
   }
   case Match_InvalidVMaskRegister: {
     SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
@@ -1784,6 +1815,57 @@ MatchFail:
   while (!VTypeIElements.empty())
     getLexer().UnLex(VTypeIElements.pop_back_val());
   return MatchOperand_NoMatch;
+}
+
+OperandMatchResultTy RISCVAsmParser::parseVTypeI0p71(OperandVector &Operands) {
+  SMLoc S = getLoc();
+  if (getLexer().isNot(AsmToken::Identifier))
+    return MatchOperand_NoMatch;
+
+  SmallVector<AsmToken, 7> VTypeIElements;
+  auto MatchFail = [&]() {
+    while (!VTypeIElements.empty())
+      getLexer().UnLex(VTypeIElements.pop_back_val());
+    return MatchOperand_NoMatch;
+  };
+
+  // Put all the tokens for vtypei operand into VTypeIElements vector.
+  while (getLexer().isNot(AsmToken::EndOfStatement)) {
+    VTypeIElements.push_back(getLexer().getTok());
+    getLexer().Lex();
+    if (getLexer().is(AsmToken::EndOfStatement))
+      break;
+    if (getLexer().isNot(AsmToken::Comma))
+      return MatchFail();
+    AsmToken Comma = getLexer().getTok();
+    VTypeIElements.push_back(Comma);
+    getLexer().Lex();
+  }
+
+  if (VTypeIElements.size() == 5) {
+    // The VTypeIElements layout is:
+    // SEW comma LMUL comma EDIV
+    //  0    1    2     3    4
+    StringRef Prefix[] = {"e", "m", "d"};
+    unsigned VTypeEle[3];
+    for (size_t i = 0; i < 3; ++i) {
+      StringRef Name = VTypeIElements[2 * i].getIdentifier();
+      if (!Name.consume_front(Prefix[i]) || Name.getAsInteger(10, VTypeEle[i]))
+        return MatchFail();
+    }
+
+    if (!RISCVVType::isValidSEW(VTypeEle[0]) ||
+        !RISCVVType::isValidLMUL(VTypeEle[1], false) ||
+        !RISCVVType::isValidEDIV(VTypeEle[2]))
+      return MatchFail();
+
+    unsigned VTypeI =
+        RISCVVType::encodeVTYPE0p71(VTypeEle[0], VTypeEle[1], VTypeEle[2]);
+    Operands.push_back(RISCVOperand::createVType0p71(VTypeI, S));
+    return MatchOperand_Success;
+  }
+
+  return MatchFail();
 }
 
 OperandMatchResultTy RISCVAsmParser::parseMaskReg(OperandVector &Operands) {
