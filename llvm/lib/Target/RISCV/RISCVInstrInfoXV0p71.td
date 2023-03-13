@@ -191,4 +191,4 @@ def XVLBUFF_V : RVV0p71VLxUFF<0b000, "vlbuff.v">;
 def XVLHUFF_V : RVV0p71VLxUFF<0b101, "vlhuff.v">;
 def XVLWUFF_V : RVV0p71VLxUFF<0b110, "vlwuff.v">;
 def XVLEFF_V : RVV0p71VLxUFF<0b111, "vleff.v">;
-} // Predicates = [HasVInstructions], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
+} // Predicates = [HasRVV0p71], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
