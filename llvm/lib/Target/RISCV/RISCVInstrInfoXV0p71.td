@@ -373,3 +373,147 @@ defm XVNCLIPU_W : VNCLP_IV_V_X_I<"vnclipu", 0b101110, uimm5, "w">;
 defm XVNCLIP_W : VNCLP_IV_V_X_I<"vnclip", 0b101111, uimm5, "w">;
 } // Constraints = "@earlyclobber $vd"
 } // Predicates = [HasRVV0p71], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
+
+let Predicates = [HasRVV0p71, HasStdExtF],
+    AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71" in {
+// Vector Single-Width Floating-Point Add/Subtract Instructions
+let Uses = [FRM], mayRaiseFPException = true in {
+defm XVFADD_V : VALU_FV_V_F<"vfadd", 0b000000>;
+defm XVFSUB_V : VALU_FV_V_F<"vfsub", 0b000010>;
+defm XVFRSUB_V : VALU_FV_F<"vfrsub", 0b100111>;
+}
+
+// Vector Widening Floating-Point Add/Subtract Instructions
+let Constraints = "@earlyclobber $vd",
+    Uses = [FRM],
+    mayRaiseFPException = true in {
+let RVVConstraint = WidenV in {
+defm XVFWADD_V : VWALU_FV_V_F<"vfwadd", 0b110000>;
+defm XVFWSUB_V : VWALU_FV_V_F<"vfwsub", 0b110010>;
+} // RVVConstraint = WidenV
+// Set earlyclobber for following instructions for second and mask operands.
+// This has the downside that the earlyclobber constraint is too coarse and
+// will impose unnecessary restrictions by not allowing the destination to
+// overlap with the first (wide) operand.
+let RVVConstraint = WidenW in {
+defm XVFWADD_W : VWALU_FV_V_F<"vfwadd", 0b110100, "w">;
+defm XVFWSUB_W : VWALU_FV_V_F<"vfwsub", 0b110110, "w">;
+} // RVVConstraint = WidenW
+} // Constraints = "@earlyclobber $vd", Uses = [FRM], mayRaiseFPException = true
+
+// Vector Single-Width Floating-Point Multiply/Divide Instructions
+let Uses = [FRM], mayRaiseFPException = true in {
+defm XVFMUL_V : VMUL_FV_V_F<"vfmul", 0b100100>;
+defm XVFDIV_V : VDIV_FV_V_F<"vfdiv", 0b100000>;
+defm XVFRDIV_V : VRDIV_FV_F<"vfrdiv", 0b100001>;
+}
+
+// Vector Widening Floating-Point Multiply
+let Constraints = "@earlyclobber $vd", RVVConstraint = WidenV,
+    Uses = [FRM], mayRaiseFPException = true in {
+defm XVFWMUL_V : VWMUL_FV_V_F<"vfwmul", 0b111000>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = WidenV, Uses = [FRM], mayRaiseFPException = true
+
+// Vector Single-Width Floating-Point Fused Multiply-Add Instructions
+let Uses = [FRM], mayRaiseFPException = true in {
+defm XVFMACC_V : VMAC_FV_V_F<"vfmacc", 0b101100>;
+defm XVFNMACC_V : VMAC_FV_V_F<"vfnmacc", 0b101101>;
+defm XVFMSAC_V : VMAC_FV_V_F<"vfmsac", 0b101110>;
+defm XVFNMSAC_V : VMAC_FV_V_F<"vfnmsac", 0b101111>;
+defm XVFMADD_V : VMAC_FV_V_F<"vfmadd", 0b101000>;
+defm XVFNMADD_V : VMAC_FV_V_F<"vfnmadd", 0b101001>;
+defm XVFMSUB_V : VMAC_FV_V_F<"vfmsub", 0b101010>;
+defm XVFNMSUB_V : VMAC_FV_V_F<"vfnmsub", 0b101011>;
+}
+
+// Vector Widening Floating-Point Fused Multiply-Add Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = WidenV,
+    Uses = [FRM], mayRaiseFPException = true in {
+defm XVFWMACC_V : VWMAC_FV_V_F<"vfwmacc", 0b111100>;
+defm XVFWNMACC_V : VWMAC_FV_V_F<"vfwnmacc", 0b111101>;
+defm XVFWMSAC_V : VWMAC_FV_V_F<"vfwmsac", 0b111110>;
+defm XVFWNMSAC_V : VWMAC_FV_V_F<"vfwnmsac", 0b111111>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = WidenV, Uses = [FRM], mayRaiseFPException = true
+
+// Vector Floating-Point Square-Root Instruction
+let Uses = [FRM], mayRaiseFPException = true in {
+defm XVFSQRT_V : VSQR_FV_VS2<"vfsqrt.v", 0b010011, 0b00000>;
+}
+
+// Vector Floating-Point MIN/MAX Instructions
+let mayRaiseFPException = true in {
+defm XVFMIN_V : VCMP_FV_V_F<"vfmin", 0b000100>;
+defm XVFMAX_V : VCMP_FV_V_F<"vfmax", 0b000110>;
+}
+
+// Vector Floating-Point Sign-Injection Instructions
+defm XVFSGNJ_V : VSGNJ_FV_V_F<"vfsgnj", 0b001000>;
+defm XVFSGNJN_V : VSGNJ_FV_V_F<"vfsgnjn", 0b001001>;
+defm XVFSGNJX_V : VSGNJ_FV_V_F<"vfsgnjx", 0b001010>;
+
+// Vector Floating-Point Compare Instructions
+let RVVConstraint = NoConstraint, mayRaiseFPException = true in {
+defm XVMFEQ_V : VCMP_FV_V_F<"vmfeq", 0b011000>;
+defm XVMFNE_V : VCMP_FV_V_F<"vmfne", 0b011100>;
+defm XVMFLT_V : VCMP_FV_V_F<"vmflt", 0b011011>;
+defm XVMFLE_V : VCMP_FV_V_F<"vmfle", 0b011001>;
+defm XVMFGT_V : VCMP_FV_F<"vmfgt", 0b011101>;
+defm XVMFGE_V : VCMP_FV_F<"vmfge", 0b011111>;
+defm XVMFORD_V : VCMP_FV_V_F<"vmford", 0b011010>;
+} // RVVConstraint = NoConstraint, mayRaiseFPException = true
+
+// Vector Floating-Point Classify Instruction
+defm XVFCLASS_V : VCLS_FV_VS2<"vfclass.v", 0b010011, 0b10000>;
+
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
+
+// Vector Floating-Point Merge Instruction
+let vm = 0 in
+def XVFMERGE_VFM : RVInstVX<0b010111, OPFVF, (outs VR:$vd),
+                           (ins VR:$vs2, FPR32:$rs1, VMV0:$v0),
+                           "vfmerge.vfm", "$vd, $vs2, $rs1, v0">,
+                  Sched<[WriteVFMergeV_UpperBound, ReadVFMergeV_UpperBound,
+                         ReadVFMergeF_UpperBound, ReadVMask]>;
+
+// Vector Floating-Point Move Instruction
+let RVVConstraint = NoConstraint in
+let vm = 1, vs2 = 0 in
+def XVFMV_V_F : RVInstVX<0b010111, OPFVF, (outs VR:$vd),
+                       (ins FPR32:$rs1), "vfmv.v.f", "$vd, $rs1">,
+               Sched<[WriteVFMovV_UpperBound, ReadVFMovF_UpperBound]>;
+
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0
+
+// Single-Width Floating-Point/Integer Type-Convert Instructions
+let mayRaiseFPException = true in {
+let Uses = [FRM] in {
+defm XVFCVT_XU_F_V : VCVTI_FV_VS2<"vfcvt.xu.f.v", 0b010010, 0b00000>;
+defm XVFCVT_X_F_V : VCVTI_FV_VS2<"vfcvt.x.f.v", 0b010010, 0b00001>;
+defm XVFCVT_F_XU_V : VCVTF_IV_VS2<"vfcvt.f.xu.v", 0b010010, 0b00010>;
+defm XVFCVT_F_X_V : VCVTF_IV_VS2<"vfcvt.f.x.v", 0b010010, 0b00011>;
+}
+} // mayRaiseFPException = true
+
+// Widening Floating-Point/Integer Type-Convert Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = WidenCvt,
+    mayRaiseFPException = true in {
+let Uses = [FRM] in {
+defm XVFWCVT_XU_F_V : VWCVTI_FV_VS2<"vfwcvt.xu.f.v", 0b010010, 0b01000>;
+defm XVFWCVT_X_F_V : VWCVTI_FV_VS2<"vfwcvt.x.f.v", 0b010010, 0b01001>;
+}
+defm XVFWCVT_F_XU_V : VWCVTF_IV_VS2<"vfwcvt.f.xu.v", 0b010010, 0b01010>;
+defm XVFWCVT_F_X_V : VWCVTF_IV_VS2<"vfwcvt.f.x.v", 0b010010, 0b01011>;
+defm XVFWCVT_F_F_V : VWCVTF_FV_VS2<"vfwcvt.f.f.v", 0b010010, 0b01100>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = WidenCvt
+
+// Narrowing Floating-Point/Integer Type-Convert Instructions
+let Constraints = "@earlyclobber $vd", mayRaiseFPException = true in {
+let Uses = [FRM] in {
+defm XVFNCVT_XU_F_W : VNCVTI_FV_VS2<"vfncvt.xu.f.v", 0b010010, 0b10000>;
+defm XVFNCVT_X_F_W : VNCVTI_FV_VS2<"vfncvt.x.f.v", 0b010010, 0b10001>;
+defm XVFNCVT_F_XU_W : VNCVTF_IV_VS2<"vfncvt.f.xu.v", 0b010010, 0b10010>;
+defm XVFNCVT_F_X_W : VNCVTF_IV_VS2<"vfncvt.f.x.v", 0b010010, 0b10011>;
+defm XVFNCVT_F_F_W : VNCVTF_FV_VS2<"vfncvt.f.f.v", 0b010010, 0b10100>;
+}
+} // Constraints = "@earlyclobber $vd", mayRaiseFPException = true
+} // Predicates = [HasRVV0p71, HasStdExtF], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
