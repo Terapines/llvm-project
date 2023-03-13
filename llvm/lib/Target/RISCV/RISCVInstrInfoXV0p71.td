@@ -129,18 +129,17 @@ let hasSideEffects = 0, mayLoad = 0, mayStore = 1,
 //===----------------------------------------------------------------------===//
 
 let Predicates = [HasRVV0p71],
-    AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71",
-    hasSideEffects = 1, mayLoad = 0, mayStore = 0 in {
+    AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71" in {
+// Configuration-Setting Instructions
+let hasSideEffects = 1, mayLoad = 0, mayStore = 0 in {
 def XVSETVLI : RVInstSetVLi<(outs GPR:$rd), (ins GPR:$rs1, VTypeI0p71:$vtypei),
                             "vsetvli", "$rd, $rs1, $vtypei">,
                             Sched<[WriteVSETVLI, ReadVSETVLI]>;
 def XVSETVL : RVInstSetVL<(outs GPR:$rd), (ins GPR:$rs1, GPR:$rs2),
                           "vsetvl", "$rd, $rs1, $rs2">,
                           Sched<[WriteVSETVL, ReadVSETVL, ReadVSETVL]>;
-}
+} // hasSideEffects = 1, mayLoad = 0, mayStore = 0
 
-let Predicates = [HasRVV0p71],
-    AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71" in {
 // Vector Unit-Stride Instructions
 def XVLB_V : RVV0p71VLx<0b000, "vlb.v">;
 def XVLH_V : RVV0p71VLx<0b101, "vlh.v">;
@@ -192,4 +191,4 @@ def XVLBUFF_V : RVV0p71VLxUFF<0b000, "vlbuff.v">;
 def XVLHUFF_V : RVV0p71VLxUFF<0b101, "vlhuff.v">;
 def XVLWUFF_V : RVV0p71VLxUFF<0b110, "vlwuff.v">;
 def XVLEFF_V : RVV0p71VLxUFF<0b111, "vleff.v">;
-}
+} // Predicates = [HasVInstructions], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
