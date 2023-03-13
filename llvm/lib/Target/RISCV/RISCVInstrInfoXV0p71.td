@@ -124,6 +124,21 @@ let hasSideEffects = 0, mayLoad = 0, mayStore = 1,
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
 }
 
+multiclass VWSMAC_V_X<string opcodestr, bits<6> funct6> {
+  def V : VALUrVV<funct6, OPIVV, opcodestr # ".vv">,
+          Sched<[WriteVIWMulAddV_UpperBound, ReadVIWMulAddV_UpperBound,
+                 ReadVIWMulAddV_UpperBound, ReadVMask]>;
+  def X : VALUrVX<funct6, OPIVX, opcodestr # ".vx">,
+          Sched<[WriteVIWMulAddX_UpperBound, ReadVIWMulAddV_UpperBound,
+                 ReadVIWMulAddX_UpperBound, ReadVMask]>;
+}
+
+multiclass VWSMAC_X<string opcodestr, bits<6> funct6> {
+  def X : VALUrVX<funct6, OPIVX, opcodestr # ".vx">,
+          Sched<[WriteVIWMulAddX_UpperBound, ReadVIWMulAddV_UpperBound,
+                 ReadVIWMulAddX_UpperBound, ReadVMask]>;
+}
+
 //===----------------------------------------------------------------------===//
 // Instructions
 //===----------------------------------------------------------------------===//
@@ -191,4 +206,170 @@ def XVLBUFF_V : RVV0p71VLxUFF<0b000, "vlbuff.v">;
 def XVLHUFF_V : RVV0p71VLxUFF<0b101, "vlhuff.v">;
 def XVLWUFF_V : RVV0p71VLxUFF<0b110, "vlwuff.v">;
 def XVLEFF_V : RVV0p71VLxUFF<0b111, "vleff.v">;
+
+// Vector Single-Width Integer Add and Subtract
+defm XVADD_V : VALU_IV_V_X_I<"vadd", 0b000000>;
+defm XVSUB_V : VALU_IV_V_X<"vsub", 0b000010>;
+defm XVRSUB_V : VALU_IV_X_I<"vrsub", 0b000011>;
+
+// Vector Widening Integer Add/Subtract
+// Refer to 11.2 Widening Vector Arithmetic Instructions
+// The destination vector register group cannot overlap a source vector
+// register group of a different element width (including the mask register
+// if masked), otherwise an illegal instruction exception is raised.
+let Constraints = "@earlyclobber $vd" in {
+let RVVConstraint = WidenV in {
+defm XVWADDU_V : VALU_MV_V_X<"vwaddu", 0b110000>;
+defm XVWSUBU_V : VALU_MV_V_X<"vwsubu", 0b110010>;
+defm XVWADD_V : VALU_MV_V_X<"vwadd", 0b110001>;
+defm XVWSUB_V : VALU_MV_V_X<"vwsub", 0b110011>;
+} // RVVConstraint = WidenV
+// Set earlyclobber for following instructions for second and mask operands.
+// This has the downside that the earlyclobber constraint is too coarse and
+// will impose unnecessary restrictions by not allowing the destination to
+// overlap with the first (wide) operand.
+let RVVConstraint = WidenW in {
+defm XVWADDU_W : VALU_MV_V_X<"vwaddu", 0b110100, "w">;
+defm XVWSUBU_W : VALU_MV_V_X<"vwsubu", 0b110110, "w">;
+defm XVWADD_W : VALU_MV_V_X<"vwadd", 0b110101, "w">;
+defm XVWSUB_W : VALU_MV_V_X<"vwsub", 0b110111, "w">;
+} // RVVConstraint = WidenW
+} // Constraints = "@earlyclobber $vd"
+
+// Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions
+defm XVADC_V : VALUm_IV_V_X_I<"vadc", 0b010000>;
+let Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint in {
+defm XVMADC_V : VALUm_IV_V_X_I<"vmadc", 0b010001>;
+defm XVMADC_V : VALUNoVm_IV_V_X_I<"vmadc", 0b010001>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint
+defm XVSBC_V : VALUm_IV_V_X<"vsbc", 0b010010>;
+let Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint in {
+defm XVMSBC_V : VALUm_IV_V_X<"vmsbc", 0b010011>;
+defm XVMSBC_V : VALUNoVm_IV_V_X<"vmsbc", 0b010011>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint
+
+// Vector Bitwise Logical Instructions
+defm XVAND_V : VALU_IV_V_X_I<"vand", 0b001001>;
+defm XVOR_V : VALU_IV_V_X_I<"vor", 0b001010>;
+defm XVXOR_V : VALU_IV_V_X_I<"vxor", 0b001011>;
+
+// Vector Single-Width Bit Shift Instructions
+defm XVSLL_V : VSHT_IV_V_X_I<"vsll", 0b100101, uimm5>;
+defm XVSRL_V : VSHT_IV_V_X_I<"vsrl", 0b101000, uimm5>;
+defm XVSRA_V : VSHT_IV_V_X_I<"vsra", 0b101001, uimm5>;
+
+// Vector Narrowing Integer Right Shift Instructions
+// Refer to 11.3. Narrowing Vector Arithmetic Instructions
+// The destination vector register group cannot overlap the first source
+// vector register group (specified by vs2). The destination vector register
+// group cannot overlap the mask register if used, unless LMUL=1.
+let Constraints = "@earlyclobber $vd" in {
+defm XVNSRL_W : VNSHT_IV_V_X_I<"vnsrl", 0b101100, uimm5, "w">;
+defm XVNSRA_W : VNSHT_IV_V_X_I<"vnsra", 0b101101, uimm5, "w">;
+} // Constraints = "@earlyclobber $vd"
+
+// Vector Integer Comparison Instructions
+let RVVConstraint = NoConstraint in {
+defm XVMSEQ_V : VCMP_IV_V_X_I<"vmseq", 0b011000>;
+defm XVMSNE_V : VCMP_IV_V_X_I<"vmsne", 0b011001>;
+defm XVMSLTU_V : VCMP_IV_V_X<"vmsltu", 0b011010>;
+defm XVMSLT_V : VCMP_IV_V_X<"vmslt", 0b011011>;
+defm XVMSLEU_V : VCMP_IV_V_X_I<"vmsleu", 0b011100>;
+defm XVMSLE_V : VCMP_IV_V_X_I<"vmsle", 0b011101>;
+defm XVMSGTU_V : VCMP_IV_X_I<"vmsgtu", 0b011110>;
+defm XVMSGT_V : VCMP_IV_X_I<"vmsgt", 0b011111>;
+} // RVVConstraint = NoConstraint
+
+// Vector Integer Min/Max Instructions
+defm XVMINU_V : VCMP_IV_V_X<"vminu", 0b000100>;
+defm XVMIN_V : VCMP_IV_V_X<"vmin", 0b000101>;
+defm XVMAXU_V : VCMP_IV_V_X<"vmaxu", 0b000110>;
+defm XVMAX_V : VCMP_IV_V_X<"vmax", 0b000111>;
+
+// Vector Single-Width Integer Multiply Instructions
+defm XVMUL_V : VMUL_MV_V_X<"vmul", 0b100101>;
+defm XVMULH_V : VMUL_MV_V_X<"vmulh", 0b100111>;
+defm XVMULHU_V : VMUL_MV_V_X<"vmulhu", 0b100100>;
+defm XVMULHSU_V : VMUL_MV_V_X<"vmulhsu", 0b100110>;
+
+// Vector Integer Divide Instructions
+defm XVDIVU_V : VDIV_MV_V_X<"vdivu", 0b100000>;
+defm XVDIV_V : VDIV_MV_V_X<"vdiv", 0b100001>;
+defm XVREMU_V : VDIV_MV_V_X<"vremu", 0b100010>;
+defm XVREM_V : VDIV_MV_V_X<"vrem", 0b100011>;
+
+// Vector Widening Integer Multiply Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = WidenV in {
+defm XVWMUL_V : VWMUL_MV_V_X<"vwmul", 0b111011>;
+defm XVWMULU_V : VWMUL_MV_V_X<"vwmulu", 0b111000>;
+defm XVWMULSU_V : VWMUL_MV_V_X<"vwmulsu", 0b111010>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = WidenV
+
+// Vector Single-Width Integer Multiply-Add Instructions
+defm XVMACC_V : VMAC_MV_V_X<"vmacc", 0b101101>;
+defm XVNMSAC_V : VMAC_MV_V_X<"vnmsac", 0b101111>;
+defm XVMADD_V : VMAC_MV_V_X<"vmadd", 0b101001>;
+defm XVNMSUB_V : VMAC_MV_V_X<"vnmsub", 0b101011>;
+
+// Vector Widening Integer Multiply-Add Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = WidenV in {
+defm XVWMACCU_V : VWMAC_MV_V_X<"vwmaccu", 0b111100>;
+defm XVWMACC_V : VWMAC_MV_V_X<"vwmacc", 0b111101>;
+defm XVWMACCSU_V : VWMAC_MV_V_X<"vwmaccsu", 0b111111>;
+defm XVWMACCUS_V : VWMAC_MV_X<"vwmaccus", 0b111110>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = WidenV
+
+// Vector Integer Merge Instructions
+defm XVMERGE_V : VMRG_IV_V_X_I<"vmerge", 0b010111>;
+
+// Vector Integer Move Instructions
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, vs2 = 0, vm = 1,
+    RVVConstraint = NoConstraint  in {
+// op vd, vs1
+def XVMV_V_V : RVInstVV<0b010111, OPIVV, (outs VR:$vd),
+                       (ins VR:$vs1), "vmv.v.v", "$vd, $vs1">,
+              Sched<[WriteVIMovV_UpperBound, ReadVIMovV_UpperBound]>;
+// op vd, rs1
+def XVMV_V_X : RVInstVX<0b010111, OPIVX, (outs VR:$vd),
+                       (ins GPR:$rs1), "vmv.v.x", "$vd, $rs1">,
+              Sched<[WriteVIMovX_UpperBound, ReadVIMovX_UpperBound]>;
+// op vd, imm
+def XVMV_V_I : RVInstIVI<0b010111, (outs VR:$vd),
+                       (ins simm5:$imm), "vmv.v.i", "$vd, $imm">,
+              Sched<[WriteVIMovI_UpperBound]>;
+              
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0
+
+// Vector Fixed-Point Arithmetic Instructions
+defm XVSADDU_V : VSALU_IV_V_X_I<"vsaddu", 0b100000>;
+defm XVSADD_V : VSALU_IV_V_X_I<"vsadd", 0b100001>;
+defm XVSSUBU_V : VSALU_IV_V_X<"vssubu", 0b100010>;
+defm XVSSUB_V : VSALU_IV_V_X<"vssub", 0b100011>;
+
+// Vector Single-Width Averaging Add and Subtract
+defm XVAADDU_V : VAALU_MV_V_X<"vaaddu", 0b001000>;
+defm XVAADD_V : VAALU_MV_V_X<"vaadd", 0b001001>;
+defm XVASUBU_V : VAALU_MV_V_X<"vasubu", 0b001010>;
+defm XVASUB_V : VAALU_MV_V_X<"vasub", 0b001011>;
+
+// Vector Single-Width Fractional Multiply with Rounding and Saturation
+defm XVSMUL_V : VSMUL_IV_V_X<"vsmul", 0b100111>;
+
+// Vector Widening Saturating Scaled Multiply-Add
+let Constraints = "@earlyclobber $vd", RVVConstraint = WidenV in {
+defm XVWSMACCU_V : VWSMAC_V_X<"vwsmaccu", 0b111100>;
+defm XVWSMACC_V : VWSMAC_V_X<"vwsmacc", 0b111101>;
+defm XVWSMACCSU_V : VWSMAC_V_X<"vwsmaccsu", 0b111111>;
+defm XVWSMACCUS_V : VWSMAC_X<"vwsmaccus", 0b111110>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = WidenV
+
+// Vector Single-Width Scaling Shift Instructions
+defm XVSSRL_V : VSSHF_IV_V_X_I<"vssrl", 0b101010, uimm5>;
+defm XVSSRA_V : VSSHF_IV_V_X_I<"vssra", 0b101011, uimm5>;
+
+// Vector Narrowing Fixed-Point Clip Instructions
+let Constraints = "@earlyclobber $vd" in {
+defm XVNCLIPU_W : VNCLP_IV_V_X_I<"vnclipu", 0b101110, uimm5, "w">;
+defm XVNCLIP_W : VNCLP_IV_V_X_I<"vnclip", 0b101111, uimm5, "w">;
+} // Constraints = "@earlyclobber $vd"
 } // Predicates = [HasRVV0p71], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
