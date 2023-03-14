@@ -516,4 +516,56 @@ defm XVFNCVT_F_F_W : VNCVTF_FV_VS2<"vfncvt.f.f.v", 0b010010, 0b10100>;
 }
 } // Constraints = "@earlyclobber $vd", mayRaiseFPException = true
 } // Predicates = [HasRVV0p71, HasStdExtF]
+
+let Predicates = [HasRVV0p71] in {
+// Vector Single-Width Integer Reduction Instructions
+let RVVConstraint = NoConstraint in {
+defm XVREDSUM : VRED_MV_V<"vredsum", 0b000000>;
+defm XVREDMAXU : VRED_MV_V<"vredmaxu", 0b000110>;
+defm XVREDMAX : VRED_MV_V<"vredmax", 0b000111>;
+defm XVREDMINU : VRED_MV_V<"vredminu", 0b000100>;
+defm XVREDMIN : VRED_MV_V<"vredmin", 0b000101>;
+defm XVREDAND : VRED_MV_V<"vredand", 0b000001>;
+defm XVREDOR : VRED_MV_V<"vredor", 0b000010>;
+defm XVREDXOR : VRED_MV_V<"vredxor", 0b000011>;
+} // RVVConstraint = NoConstraint
+
+// Vector Widening Integer Reduction Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint in {
+// Set earlyclobber for following instructions for second and mask operands.
+// This has the downside that the earlyclobber constraint is too coarse and
+// will impose unnecessary restrictions by not allowing the destination to
+// overlap with the first (wide) operand.
+defm XVWREDSUMU : VWRED_IV_V<"vwredsumu", 0b110000>;
+defm XVWREDSUM : VWRED_IV_V<"vwredsum", 0b110001>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint
+
+} // Predicates = [HasRVV0p71]
+
+let Predicates = [HasRVV0p71, HasStdExtF] in {
+// Vector Single-Width Floating-Point Reduction Instructions
+let RVVConstraint = NoConstraint in {
+let Uses = [FRM], mayRaiseFPException = true in {
+defm XVFREDOSUM : VREDO_FV_V<"vfredosum", 0b000011>;
+defm XVFREDUSUM : VRED_FV_V<"vfredsum", 0b000001>;
+}
+let mayRaiseFPException = true in {
+defm XVFREDMAX : VRED_FV_V<"vfredmax", 0b000111>;
+defm XVFREDMIN : VRED_FV_V<"vfredmin", 0b000101>;
+}
+} // RVVConstraint = NoConstraint
+
+// Vector Widening Floating-Point Reduction Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint in {
+// Set earlyclobber for following instructions for second and mask operands.
+// This has the downside that the earlyclobber constraint is too coarse and
+// will impose unnecessary restrictions by not allowing the destination to
+// overlap with the first (wide) operand.
+let Uses = [FRM], mayRaiseFPException = true in {
+defm XVFWREDOSUM : VWREDO_FV_V<"vfwredosum", 0b110011>;
+defm XVFWREDUSUM : VWRED_FV_V<"vfwredsum", 0b110001>;
+}
+} // Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint
+} // Predicates = [HasRVV0p71, HasStdExtF]
+
 } // AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
