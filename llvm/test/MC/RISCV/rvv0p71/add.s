@@ -292,49 +292,36 @@ vsadd.vi v8, v4, 15
 
 vaadd.vv v8, v4, v20, v0.t
 # CHECK-INST: vaadd.vv v8, v4, v20, v0.t
-# CHECK-ENCODING: [0x57,0x24,0x4a,0x24]
+# CHECK-ENCODING: [0x57,0x04,0x4a,0x90]
 # CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 24 4a 24 <unknown>
+# CHECK-UNKNOWN: 57 04 4a 90 <unknown>
 
 vaadd.vv v8, v4, v20
 # CHECK-INST: vaadd.vv v8, v4, v20
-# CHECK-ENCODING: [0x57,0x24,0x4a,0x26]
+# CHECK-ENCODING: [0x57,0x04,0x4a,0x92]
 # CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 24 4a 26 <unknown>
+# CHECK-UNKNOWN: 57 04 4a 92 <unknown>
 
 vaadd.vx v8, v4, a0, v0.t
 # CHECK-INST: vaadd.vx v8, v4, a0, v0.t
-# CHECK-ENCODING: [0x57,0x64,0x45,0x24]
+# CHECK-ENCODING: [0x57,0x44,0x45,0x90]
 # CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 64 45 24 <unknown>
+# CHECK-UNKNOWN: 57 44 45 90 <unknown>
 
 vaadd.vx v8, v4, a0
 # CHECK-INST: vaadd.vx v8, v4, a0
-# CHECK-ENCODING: [0x57,0x64,0x45,0x26]
+# CHECK-ENCODING: [0x57,0x44,0x45,0x92]
 # CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 64 45 26 <unknown>
+# CHECK-UNKNOWN: 57 44 45 92 <unknown>
 
-vaaddu.vv v8, v4, v20, v0.t
-# CHECK-INST: vaaddu.vv v8, v4, v20, v0.t
-# CHECK-ENCODING: [0x57,0x24,0x4a,0x20]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 24 4a 20 <unknown>
+vaadd.vi v8, v4, 15, v0.t
+# CHECK-INST: vaadd.vi v8, v4, 15, v0.t
+# CHECK-ENCODING: [0x57,0xb4,0x47,0x90]
+# CHECK-ERROR: unrecognized instruction mnemonic
+# CHECK-UNKNOWN: 57 b4 47 90 <unknown>
 
-vaaddu.vv v8, v4, v20
-# CHECK-INST: vaaddu.vv v8, v4, v20
-# CHECK-ENCODING: [0x57,0x24,0x4a,0x22]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 24 4a 22 <unknown>
-
-vaaddu.vx v8, v4, a0, v0.t
-# CHECK-INST: vaaddu.vx v8, v4, a0, v0.t
-# CHECK-ENCODING: [0x57,0x64,0x45,0x20]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 64 45 20 <unknown>
-
-vaaddu.vx v8, v4, a0
-# CHECK-INST: vaaddu.vx v8, v4, a0
-# CHECK-ENCODING: [0x57,0x64,0x45,0x22]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
-# CHECK-UNKNOWN: 57 64 45 22 <unknown>
-
+vaadd.vi v8, v4, 15
+# CHECK-INST: vaadd.vi v8, v4, 15
+# CHECK-ENCODING: [0x57,0xb4,0x47,0x92]
+# CHECK-ERROR: unrecognized instruction mnemonic
+# CHECK-UNKNOWN: 57 b4 47 92 <unknown>

@@ -337,7 +337,6 @@ def XVMV_V_X : RVInstVX<0b010111, OPIVX, (outs VR:$vd),
 def XVMV_V_I : RVInstIVI<0b010111, (outs VR:$vd),
                        (ins simm5:$imm), "vmv.v.i", "$vd, $imm">,
               Sched<[WriteVIMovI_UpperBound]>;
-              
 } // hasSideEffects = 0, mayLoad = 0, mayStore = 0
 
 // Vector Fixed-Point Arithmetic Instructions
@@ -347,10 +346,8 @@ defm XVSSUBU_V : VSALU_IV_V_X<"vssubu", 0b100010>;
 defm XVSSUB_V : VSALU_IV_V_X<"vssub", 0b100011>;
 
 // Vector Single-Width Averaging Add and Subtract
-defm XVAADDU_V : VAALU_MV_V_X<"vaaddu", 0b001000>;
-defm XVAADD_V : VAALU_MV_V_X<"vaadd", 0b001001>;
-defm XVASUBU_V : VAALU_MV_V_X<"vasubu", 0b001010>;
-defm XVASUB_V : VAALU_MV_V_X<"vasub", 0b001011>;
+defm XVAADD_V : VSALU_IV_V_X_I<"vaadd", 0b100100>;
+defm XVASUB_V : VSALU_IV_V_X<"vasub", 0b100110>;
 
 // Vector Single-Width Fractional Multiply with Rounding and Saturation
 defm XVSMUL_V : VSMUL_IV_V_X<"vsmul", 0b100111>;
@@ -359,8 +356,8 @@ defm XVSMUL_V : VSMUL_IV_V_X<"vsmul", 0b100111>;
 let Constraints = "@earlyclobber $vd", RVVConstraint = WidenV in {
 defm XVWSMACCU_V : VWSMAC_V_X<"vwsmaccu", 0b111100>;
 defm XVWSMACC_V : VWSMAC_V_X<"vwsmacc", 0b111101>;
-defm XVWSMACCSU_V : VWSMAC_V_X<"vwsmaccsu", 0b111111>;
-defm XVWSMACCUS_V : VWSMAC_X<"vwsmaccus", 0b111110>;
+defm XVWSMACCSU_V : VWSMAC_V_X<"vwsmaccsu", 0b111110>;
+defm XVWSMACCUS_V : VWSMAC_X<"vwsmaccus", 0b111111>;
 } // Constraints = "@earlyclobber $vd", RVVConstraint = WidenV
 
 // Vector Single-Width Scaling Shift Instructions
@@ -436,7 +433,7 @@ defm XVFWNMSAC_V : VWMAC_FV_V_F<"vfwnmsac", 0b111111>;
 
 // Vector Floating-Point Square-Root Instruction
 let Uses = [FRM], mayRaiseFPException = true in {
-defm XVFSQRT_V : VSQR_FV_VS2<"vfsqrt.v", 0b010011, 0b00000>;
+defm XVFSQRT_V : VSQR_FV_VS2<"vfsqrt.v", 0b100011, 0b00000>;
 }
 
 // Vector Floating-Point MIN/MAX Instructions
@@ -462,7 +459,7 @@ defm XVMFORD_V : VCMP_FV_V_F<"vmford", 0b011010>;
 } // RVVConstraint = NoConstraint, mayRaiseFPException = true
 
 // Vector Floating-Point Classify Instruction
-defm XVFCLASS_V : VCLS_FV_VS2<"vfclass.v", 0b010011, 0b10000>;
+defm XVFCLASS_V : VCLS_FV_VS2<"vfclass.v", 0b100011, 0b10000>;
 
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
 
@@ -486,10 +483,10 @@ def XVFMV_V_F : RVInstVX<0b010111, OPFVF, (outs VR:$vd),
 // Single-Width Floating-Point/Integer Type-Convert Instructions
 let mayRaiseFPException = true in {
 let Uses = [FRM] in {
-defm XVFCVT_XU_F_V : VCVTI_FV_VS2<"vfcvt.xu.f.v", 0b010010, 0b00000>;
-defm XVFCVT_X_F_V : VCVTI_FV_VS2<"vfcvt.x.f.v", 0b010010, 0b00001>;
-defm XVFCVT_F_XU_V : VCVTF_IV_VS2<"vfcvt.f.xu.v", 0b010010, 0b00010>;
-defm XVFCVT_F_X_V : VCVTF_IV_VS2<"vfcvt.f.x.v", 0b010010, 0b00011>;
+defm XVFCVT_XU_F_V : VCVTI_FV_VS2<"vfcvt.xu.f.v", 0b100010, 0b00000>;
+defm XVFCVT_X_F_V : VCVTI_FV_VS2<"vfcvt.x.f.v", 0b100010, 0b00001>;
+defm XVFCVT_F_XU_V : VCVTF_IV_VS2<"vfcvt.f.xu.v", 0b100010, 0b00010>;
+defm XVFCVT_F_X_V : VCVTF_IV_VS2<"vfcvt.f.x.v", 0b100010, 0b00011>;
 }
 } // mayRaiseFPException = true
 
@@ -497,22 +494,22 @@ defm XVFCVT_F_X_V : VCVTF_IV_VS2<"vfcvt.f.x.v", 0b010010, 0b00011>;
 let Constraints = "@earlyclobber $vd", RVVConstraint = WidenCvt,
     mayRaiseFPException = true in {
 let Uses = [FRM] in {
-defm XVFWCVT_XU_F_V : VWCVTI_FV_VS2<"vfwcvt.xu.f.v", 0b010010, 0b01000>;
-defm XVFWCVT_X_F_V : VWCVTI_FV_VS2<"vfwcvt.x.f.v", 0b010010, 0b01001>;
+defm XVFWCVT_XU_F_V : VWCVTI_FV_VS2<"vfwcvt.xu.f.v", 0b100010, 0b01000>;
+defm XVFWCVT_X_F_V : VWCVTI_FV_VS2<"vfwcvt.x.f.v", 0b100010, 0b01001>;
 }
-defm XVFWCVT_F_XU_V : VWCVTF_IV_VS2<"vfwcvt.f.xu.v", 0b010010, 0b01010>;
-defm XVFWCVT_F_X_V : VWCVTF_IV_VS2<"vfwcvt.f.x.v", 0b010010, 0b01011>;
-defm XVFWCVT_F_F_V : VWCVTF_FV_VS2<"vfwcvt.f.f.v", 0b010010, 0b01100>;
+defm XVFWCVT_F_XU_V : VWCVTF_IV_VS2<"vfwcvt.f.xu.v", 0b100010, 0b01010>;
+defm XVFWCVT_F_X_V : VWCVTF_IV_VS2<"vfwcvt.f.x.v", 0b100010, 0b01011>;
+defm XVFWCVT_F_F_V : VWCVTF_FV_VS2<"vfwcvt.f.f.v", 0b100010, 0b01100>;
 } // Constraints = "@earlyclobber $vd", RVVConstraint = WidenCvt
 
 // Narrowing Floating-Point/Integer Type-Convert Instructions
 let Constraints = "@earlyclobber $vd", mayRaiseFPException = true in {
 let Uses = [FRM] in {
-defm XVFNCVT_XU_F_W : VNCVTI_FV_VS2<"vfncvt.xu.f.v", 0b010010, 0b10000>;
-defm XVFNCVT_X_F_W : VNCVTI_FV_VS2<"vfncvt.x.f.v", 0b010010, 0b10001>;
-defm XVFNCVT_F_XU_W : VNCVTF_IV_VS2<"vfncvt.f.xu.v", 0b010010, 0b10010>;
-defm XVFNCVT_F_X_W : VNCVTF_IV_VS2<"vfncvt.f.x.v", 0b010010, 0b10011>;
-defm XVFNCVT_F_F_W : VNCVTF_FV_VS2<"vfncvt.f.f.v", 0b010010, 0b10100>;
+defm XVFNCVT_XU_F_W : VNCVTI_FV_VS2<"vfncvt.xu.f.v", 0b100010, 0b10000>;
+defm XVFNCVT_X_F_W : VNCVTI_FV_VS2<"vfncvt.x.f.v", 0b100010, 0b10001>;
+defm XVFNCVT_F_XU_W : VNCVTF_IV_VS2<"vfncvt.f.xu.v", 0b100010, 0b10010>;
+defm XVFNCVT_F_X_W : VNCVTF_IV_VS2<"vfncvt.f.x.v", 0b100010, 0b10011>;
+defm XVFNCVT_F_F_W : VNCVTF_FV_VS2<"vfncvt.f.f.v", 0b100010, 0b10100>;
 }
 } // Constraints = "@earlyclobber $vd", mayRaiseFPException = true
 } // Predicates = [HasRVV0p71, HasStdExtF]
@@ -585,14 +582,14 @@ let hasSideEffects = 0, mayLoad = 0, mayStore = 0,
     RVVConstraint = NoConstraint  in {
 
 // Vector mask population count vmpopc
-def XVMPOPC_M : RVInstV<0b010000, 0b10000, OPMVV, (outs GPR:$vd),
+def XVMPOPC_M : RVInstV<0b010100, 0b00000, OPMVV, (outs GPR:$vd),
                       (ins VR:$vs2, VMaskOp:$vm),
                       "vmpopc.m", "$vd, $vs2$vm">,
               Sched<[WriteVMPopV_UpperBound, ReadVMPopV_UpperBound,
                      ReadVMask]>;
 
 // vmfirst find-first-set mask bit
-def XVMFIRST_M : RVInstV<0b010000, 0b10001, OPMVV, (outs GPR:$vd),
+def XVMFIRST_M : RVInstV<0b010101, 0b00000, OPMVV, (outs GPR:$vd),
                        (ins VR:$vs2, VMaskOp:$vm),
                        "vmfirst.m", "$vd, $vs2$vm">,
               Sched<[WriteVMFFSV_UpperBound, ReadVMFFSV_UpperBound,
@@ -603,20 +600,20 @@ def XVMFIRST_M : RVInstV<0b010000, 0b10001, OPMVV, (outs GPR:$vd),
 let Constraints = "@earlyclobber $vd", RVVConstraint = Iota in {
 
 // vmsbf.m set-before-first mask bit
-defm XVMSBF_M : VMSFS_MV_V<"vmsbf.m", 0b010100, 0b00001>;
+defm XVMSBF_M : VMSFS_MV_V<"vmsbf.m", 0b010110, 0b00001>;
 // vmsif.m set-including-first mask bit
-defm XVMSIF_M : VMSFS_MV_V<"vmsif.m", 0b010100, 0b00011>;
+defm XVMSIF_M : VMSFS_MV_V<"vmsif.m", 0b010110, 0b00011>;
 // vmsof.m set-only-first mask bit
-defm XVMSOF_M : VMSFS_MV_V<"vmsof.m", 0b010100, 0b00010>;
+defm XVMSOF_M : VMSFS_MV_V<"vmsof.m", 0b010110, 0b00010>;
 // Vector Iota Instruction
-defm XVIOTA_M : VMIOT_MV_V<"viota.m", 0b010100, 0b10000>;
+defm XVIOTA_M : VMIOT_MV_V<"viota.m", 0b010110, 0b10000>;
 
 } // Constraints = "@earlyclobber $vd", RVVConstraint = Iota
 
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
 // Vector Element Index Instruction
 let vs2 = 0 in
-def XVID_V : RVInstV<0b010100, 0b10001, OPMVV, (outs VR:$vd),
+def XVID_V : RVInstV<0b010110, 0b10001, OPMVV, (outs VR:$vd),
                     (ins VMaskOp:$vm), "vid.v", "$vd$vm">,
             Sched<[WriteVMIdxV_UpperBound, ReadVMask]>;
 } // hasSideEffects = 0, mayLoad = 0, mayStore = 0

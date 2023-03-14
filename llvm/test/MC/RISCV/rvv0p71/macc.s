@@ -238,36 +238,36 @@ vwsmacc.vx v8, a0, v4
 
 vwsmaccsu.vv v8, v20, v4, v0.t
 # CHECK-INST: vwsmaccsu.vv v8, v20, v4, v0.t
-# CHECK-ENCODING: [0x57,0x04,0x4a,0xfc]
+# CHECK-ENCODING: [0x57,0x04,0x4a,0xf8]
 # CHECK-ERROR: unrecognized instruction mnemonic
-# CHECK-UNKNOWN: 57 04 4a fc <unknown>
+# CHECK-UNKNOWN: 57 04 4a f8 <unknown>
 
 vwsmaccsu.vv v8, v20, v4
 # CHECK-INST: vwsmaccsu.vv v8, v20, v4
-# CHECK-ENCODING: [0x57,0x04,0x4a,0xfe]
+# CHECK-ENCODING: [0x57,0x04,0x4a,0xfa]
 # CHECK-ERROR: unrecognized instruction mnemonic
-# CHECK-UNKNOWN: 57 04 4a fe <unknown>
+# CHECK-UNKNOWN: 57 04 4a fa <unknown>
 
 vwsmaccsu.vx v8, a0, v4, v0.t
 # CHECK-INST: vwsmaccsu.vx v8, a0, v4, v0.t
-# CHECK-ENCODING: [0x57,0x44,0x45,0xfc]
-# CHECK-ERROR: unrecognized instruction mnemonic
-# CHECK-UNKNOWN: 57 44 45 fc <unknown>
-
-vwsmaccsu.vx v8, a0, v4
-# CHECK-INST: vwsmaccsu.vx v8, a0, v4
-# CHECK-ENCODING: [0x57,0x44,0x45,0xfe]
-# CHECK-ERROR: unrecognized instruction mnemonic
-# CHECK-UNKNOWN: 57 44 45 fe <unknown>
-
-vwsmaccus.vx v8, a0, v4, v0.t
-# CHECK-INST: vwsmaccus.vx v8, a0, v4, v0.t
 # CHECK-ENCODING: [0x57,0x44,0x45,0xf8]
 # CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 44 45 f8 <unknown>
 
-vwsmaccus.vx v8, a0, v4
-# CHECK-INST: vwsmaccus.vx v8, a0, v4
+vwsmaccsu.vx v8, a0, v4
+# CHECK-INST: vwsmaccsu.vx v8, a0, v4
 # CHECK-ENCODING: [0x57,0x44,0x45,0xfa]
 # CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 44 45 fa <unknown>
+
+vwsmaccus.vx v8, a0, v4, v0.t
+# CHECK-INST: vwsmaccus.vx v8, a0, v4, v0.t
+# CHECK-ENCODING: [0x57,0x44,0x45,0xfc]
+# CHECK-ERROR: unrecognized instruction mnemonic
+# CHECK-UNKNOWN: 57 44 45 fc <unknown>
+
+vwsmaccus.vx v8, a0, v4
+# CHECK-INST: vwsmaccus.vx v8, a0, v4
+# CHECK-ENCODING: [0x57,0x44,0x45,0xfe]
+# CHECK-ERROR: unrecognized instruction mnemonic
+# CHECK-UNKNOWN: 57 44 45 fe <unknown>
