@@ -143,8 +143,8 @@ multiclass VWSMAC_X<string opcodestr, bits<6> funct6> {
 // Instructions
 //===----------------------------------------------------------------------===//
 
-let Predicates = [HasRVV0p71],
-    AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71" in {
+let AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71" in {
+let Predicates = [HasRVV0p71] in {
 // Configuration-Setting Instructions
 let hasSideEffects = 1, mayLoad = 0, mayStore = 0 in {
 def XVSETVLI : RVInstSetVLi<(outs GPR:$rd), (ins GPR:$rs1, VTypeI0p71:$vtypei),
@@ -372,10 +372,9 @@ let Constraints = "@earlyclobber $vd" in {
 defm XVNCLIPU_W : VNCLP_IV_V_X_I<"vnclipu", 0b101110, uimm5, "w">;
 defm XVNCLIP_W : VNCLP_IV_V_X_I<"vnclip", 0b101111, uimm5, "w">;
 } // Constraints = "@earlyclobber $vd"
-} // Predicates = [HasRVV0p71], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
+} // Predicates = [HasRVV0p71]
 
-let Predicates = [HasRVV0p71, HasStdExtF],
-    AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71" in {
+let Predicates = [HasRVV0p71, HasStdExtF] in {
 // Vector Single-Width Floating-Point Add/Subtract Instructions
 let Uses = [FRM], mayRaiseFPException = true in {
 defm XVFADD_V : VALU_FV_V_F<"vfadd", 0b000000>;
@@ -516,4 +515,5 @@ defm XVFNCVT_F_X_W : VNCVTF_IV_VS2<"vfncvt.f.x.v", 0b010010, 0b10011>;
 defm XVFNCVT_F_F_W : VNCVTF_FV_VS2<"vfncvt.f.f.v", 0b010010, 0b10100>;
 }
 } // Constraints = "@earlyclobber $vd", mayRaiseFPException = true
-} // Predicates = [HasRVV0p71, HasStdExtF], AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
+} // Predicates = [HasRVV0p71, HasStdExtF]
+} // AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
