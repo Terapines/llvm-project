@@ -616,7 +616,58 @@ let vs2 = 0 in
 def XVID_V : RVInstV<0b010110, 0b10001, OPMVV, (outs VR:$vd),
                     (ins VMaskOp:$vm), "vid.v", "$vd$vm">,
             Sched<[WriteVMIdxV_UpperBound, ReadVMask]>;
-} // hasSideEffects = 0, mayLoad = 0, mayStore = 0
 
+let vm = 1, RVVConstraint = NoConstraint in {
+// Integer Extract Instruction
+def XVEXT_X_V : RVInstVX<0b001100, OPMVV, (outs GPR:$vd),
+                         (ins VR:$vs2, GPR:$rs1),
+                         "vext.x.v", "$vd, $vs2, $rs1">,
+                Sched<[WriteVIMovVX_UpperBound, ReadVIMovVX_UpperBound,
+                       ReadVIMovXX_UpperBound]>;
+
+// Integer Scalar Move Instruction
+let Constraints = "$vd = $vd_wb" in
+def XVMV_S_X : RVInstV2<0b001101, 0b00000, OPMVX, (outs VR:$vd_wb),
+                       (ins VR:$vd, GPR:$rs1), "vmv.s.x", "$vd, $rs1">,
+               Sched<[WriteVIMovXV_UpperBound, ReadVIMovXV_UpperBound,
+                      ReadVIMovXX_UpperBound]>;
+}
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0
+} // Predicates = [HasRVV0p71]
+
+let Predicates = [HasRVV0p71, HasStdExtF] in {
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, vm = 1,
+    RVVConstraint = NoConstraint  in {
+// Floating-Point Scalar Move Instructions
+def XVFMV_F_S : RVInstV<0b001100, 0b00000, OPFVV, (outs FPR32:$vd),
+                        (ins VR:$vs2), "vfmv.f.s", "$vd, $vs2">,
+                Sched<[WriteVFMovVF_UpperBound, ReadVFMovVF_UpperBound]>;
+let Constraints = "$vd = $vd_wb" in
+def XVFMV_S_F : RVInstV2<0b001101, 0b00000, OPFVF, (outs VR:$vd_wb),
+                         (ins VR:$vd, FPR32:$rs1), "vfmv.s.f", "$vd, $rs1">,
+                Sched<[WriteVFMovFV_UpperBound, ReadVFMovFV_UpperBound,
+                       ReadVFMovFX_UpperBound]>;
+
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0, vm = 1
+} // Predicates = [HasRVV0p71, HasStdExtF]
+
+let Predicates = [HasRVV0p71] in  {
+// Vector Slide Instructions
+let Constraints = "@earlyclobber $vd", RVVConstraint = SlideUp in {
+defm XVSLIDEUP_V : VSLD_IV_X_I<"vslideup", 0b001110, uimm5>;
+defm XVSLIDE1UP_V : VSLD1_MV_X<"vslide1up", 0b001110>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = SlideUp
+defm XVSLIDEDOWN_V : VSLD_IV_X_I<"vslidedown", 0b001111, uimm5>;
+defm XVSLIDE1DOWN_V : VSLD1_MV_X<"vslide1down", 0b001111>;
+
+// Vector Register Gather Instruction
+let Constraints = "@earlyclobber $vd", RVVConstraint = Vrgather in {
+defm XVRGATHER_V : VGTR_IV_V_X_I<"vrgather", 0b001100, uimm5>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = Vrgather
+
+// Vector Compress Instruction
+let Constraints = "@earlyclobber $vd", RVVConstraint = Vcompress in {
+defm XVCOMPRESS_V : VCPR_MV_Mask<"vcompress", 0b010111>;
+} // Constraints = "@earlyclobber $vd", RVVConstraint = Vcompress
 } // Predicates = [HasRVV0p71]
 } // AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
