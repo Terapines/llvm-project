@@ -568,4 +568,58 @@ defm XVFWREDUSUM : VWRED_FV_V<"vfwredsum", 0b110001>;
 } // Constraints = "@earlyclobber $vd", RVVConstraint = NoConstraint
 } // Predicates = [HasRVV0p71, HasStdExtF]
 
+let Predicates = [HasRVV0p71] in {
+// Vector Mask-Register Logical Instructions
+let RVVConstraint = NoConstraint in {
+defm XVMAND_M : VMALU_MV_Mask<"vmand", 0b011001, "m">;
+defm XVMNAND_M : VMALU_MV_Mask<"vmnand", 0b011101, "m">;
+defm XVMANDN_M : VMALU_MV_Mask<"vmandnot", 0b011000, "m">;
+defm XVMXOR_M : VMALU_MV_Mask<"vmxor", 0b011011, "m">;
+defm XVMOR_M : VMALU_MV_Mask<"vmor", 0b011010, "m">;
+defm XVMNOR_M : VMALU_MV_Mask<"vmnor", 0b011110, "m">;
+defm XVMORN_M : VMALU_MV_Mask<"vmornot", 0b011100, "m">;
+defm XVMXNOR_M : VMALU_MV_Mask<"vmxnor", 0b011111, "m">;
+}
+
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0,
+    RVVConstraint = NoConstraint  in {
+
+// Vector mask population count vmpopc
+def XVMPOPC_M : RVInstV<0b010000, 0b10000, OPMVV, (outs GPR:$vd),
+                      (ins VR:$vs2, VMaskOp:$vm),
+                      "vmpopc.m", "$vd, $vs2$vm">,
+              Sched<[WriteVMPopV_UpperBound, ReadVMPopV_UpperBound,
+                     ReadVMask]>;
+
+// vmfirst find-first-set mask bit
+def XVMFIRST_M : RVInstV<0b010000, 0b10001, OPMVV, (outs GPR:$vd),
+                       (ins VR:$vs2, VMaskOp:$vm),
+                       "vmfirst.m", "$vd, $vs2$vm">,
+              Sched<[WriteVMFFSV_UpperBound, ReadVMFFSV_UpperBound,
+                     ReadVMask]>;
+
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0
+
+let Constraints = "@earlyclobber $vd", RVVConstraint = Iota in {
+
+// vmsbf.m set-before-first mask bit
+defm XVMSBF_M : VMSFS_MV_V<"vmsbf.m", 0b010100, 0b00001>;
+// vmsif.m set-including-first mask bit
+defm XVMSIF_M : VMSFS_MV_V<"vmsif.m", 0b010100, 0b00011>;
+// vmsof.m set-only-first mask bit
+defm XVMSOF_M : VMSFS_MV_V<"vmsof.m", 0b010100, 0b00010>;
+// Vector Iota Instruction
+defm XVIOTA_M : VMIOT_MV_V<"viota.m", 0b010100, 0b10000>;
+
+} // Constraints = "@earlyclobber $vd", RVVConstraint = Iota
+
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
+// Vector Element Index Instruction
+let vs2 = 0 in
+def XVID_V : RVInstV<0b010100, 0b10001, OPMVV, (outs VR:$vd),
+                    (ins VMaskOp:$vm), "vid.v", "$vd$vm">,
+            Sched<[WriteVMIdxV_UpperBound, ReadVMask]>;
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0
+
+} // Predicates = [HasRVV0p71]
 } // AsmVariantName = "RVV0p71", DecoderNamespace = "RVV0p71"
