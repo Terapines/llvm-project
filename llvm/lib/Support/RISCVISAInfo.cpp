@@ -128,6 +128,7 @@ static const RISCVSupportedExtension SupportedExtensions[] = {
 
     // We regard RVV0.71 as a custom extensions.
     {"xv", RISCVExtensionVersion{0, 71}},
+    {"xvlsseg", RISCVExtensionVersion{0, 71}},
 };
 
 static const RISCVSupportedExtension SupportedExperimentalExtensions[] = {
@@ -880,6 +881,11 @@ Error RISCVISAInfo::checkDependency() {
     return createStringError(
         errc::invalid_argument,
         "xv requires v and zve* extension to be disabled.");
+
+  if (Exts.count("xvlsseg") && !Exts.count("xv"))
+    return createStringError(
+        errc::invalid_argument,
+        "xvlsseg requires xv extension to also be specified");
 
   return Error::success();
 }

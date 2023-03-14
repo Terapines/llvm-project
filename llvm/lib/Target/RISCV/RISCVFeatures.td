@@ -573,6 +573,13 @@ def FeatureRVV0p71
 def HasRVV0p71 : Predicate<"Subtarget->hasRVV0p71()">,
                            AssemblerPredicate<(all_of FeatureRVV0p71),
                            "'xv' (Vector Extension for 0.71 Version)">;
+def FeatureXvlsseg
+    : SubtargetFeature<"xvlsseg", "HasXvlsseg", "true",
+                       "'xvlsseg' (Vector Load/Store Segment Instructions for RVV0.71)",
+                       [FeatureRVV0p71]>;
+def HasXvlsseg : Predicate<"Subtarget->hasXvlsseg()">,
+                           AssemblerPredicate<(all_of FeatureXvlsseg),
+                           "'xvlsseg' (Vector Load/Store Segment Instructions for RVV0.71)">;
 
 //===----------------------------------------------------------------------===//
 // LLVM specific features and extensions
