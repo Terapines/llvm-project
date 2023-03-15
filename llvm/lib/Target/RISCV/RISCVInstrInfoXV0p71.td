@@ -60,66 +60,66 @@ class RVV0p71VLoadStore<bits<3> nf, bits<3> mop, bits<3> width,
 
 let hasSideEffects = 0, mayLoad = 1, mayStore = 0, RVVConstraint = VMConstraint,
     Opcode = OPC_LOAD_FP.Value in {
-  class RVV0p71VLxU<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b000, width, (outs VR:$rd),
+  class RVV0p71VLxU<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b000, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1})$vm"> {
     let rs2 = 0b00000;
   }
-  class RVV0p71VLx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b100, width, (outs VR:$rd),
+  class RVV0p71VLx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b100, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1})$vm"> {
     let rs2 = 0b00000;
   }
-  class RVV0p71VLxUFF<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b000, width, (outs VR:$rd),
+  class RVV0p71VLxUFF<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b000, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1})$vm"> {
     let rs2 = 0b10000;
   }
-  class RVV0p71VLxFF<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b100, width, (outs VR:$rd),
+  class RVV0p71VLxFF<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b100, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1})$vm"> {
     let rs2 = 0b10000;
   }
-  class RVV0p71VLSxU<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b010, width, (outs VR:$rd),
+  class RVV0p71VLSxU<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b010, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, GPR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
-  class RVV0p71VLSx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b110, width, (outs VR:$rd),
+  class RVV0p71VLSx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b110, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, GPR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
-  class RVV0p71VLXxU<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b011, width, (outs VR:$rd),
+  class RVV0p71VLXxU<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b011, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, VR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
-  class RVV0p71VLXx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b111, width, (outs VR:$rd),
+  class RVV0p71VLXx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b111, width, (outs VR:$rd),
                           (ins GPRMem:$rs1, VR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
 }
 
 let hasSideEffects = 0, mayLoad = 0, mayStore = 1,
     Opcode = OPC_STORE_FP.Value in {
-  class RVV0p71VSx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b000, width, (outs),
+  class RVV0p71VSx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b000, width, (outs),
                           (ins VR:$rd, GPRMem:$rs1, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1})$vm"> {
     let rs2 = 0b00000;
   }
-  class RVV0p71VSSx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b010, width, (outs),
+  class RVV0p71VSSx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b010, width, (outs),
                           (ins VR:$rd, GPRMem:$rs1, GPR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
-  class RVV0p71VSXx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b011, width, (outs),
+  class RVV0p71VSXx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b011, width, (outs),
                           (ins VR:$rd, GPRMem:$rs1, VR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
-  class RVV0p71VSUXx<bits<3> width, string opcodestr>
-      : RVV0p71VLoadStore<0b000, 0b111, width, (outs),
+  class RVV0p71VSUXx<bits<3> nf, bits<3> width, string opcodestr>
+      : RVV0p71VLoadStore<nf, 0b111, width, (outs),
                           (ins VR:$rd, GPRMem:$rs1, VR:$rs2, VMaskOp:$vm),
                           opcodestr, "$rd, (${rs1}), $rs2$vm">;
 }
@@ -156,57 +156,109 @@ def XVSETVL : RVInstSetVL<(outs GPR:$rd), (ins GPR:$rs1, GPR:$rs2),
 } // hasSideEffects = 1, mayLoad = 0, mayStore = 0
 
 // Vector Unit-Stride Instructions
-def XVLB_V : RVV0p71VLx<0b000, "vlb.v">;
-def XVLH_V : RVV0p71VLx<0b101, "vlh.v">;
-def XVLW_V : RVV0p71VLx<0b110, "vlw.v">;
-def XVLBU_V : RVV0p71VLxU<0b000, "vlbu.v">;
-def XVLHU_V : RVV0p71VLxU<0b101, "vlhu.v">;
-def XVLWU_V : RVV0p71VLxU<0b110, "vlwu.v">;
-def XVLE_V : RVV0p71VLxU<0b111, "vle.v">;
-def XVSB_V : RVV0p71VSx<0b000, "vsb.v">;
-def XVSH_V : RVV0p71VSx<0b101, "vsh.v">;
-def XVSW_V : RVV0p71VSx<0b110, "vsw.v">;
-def XVSE_V : RVV0p71VSx<0b111, "vse.v">;
+def XVLB_V : RVV0p71VLx<0b000, 0b000, "vlb.v">;
+def XVLH_V : RVV0p71VLx<0b000, 0b101, "vlh.v">;
+def XVLW_V : RVV0p71VLx<0b000, 0b110, "vlw.v">;
+def XVLBU_V : RVV0p71VLxU<0b000, 0b000, "vlbu.v">;
+def XVLHU_V : RVV0p71VLxU<0b000, 0b101, "vlhu.v">;
+def XVLWU_V : RVV0p71VLxU<0b000, 0b110, "vlwu.v">;
+def XVLE_V : RVV0p71VLxU<0b000, 0b111, "vle.v">;
+def XVSB_V : RVV0p71VSx<0b000, 0b000, "vsb.v">;
+def XVSH_V : RVV0p71VSx<0b000, 0b101, "vsh.v">;
+def XVSW_V : RVV0p71VSx<0b000, 0b110, "vsw.v">;
+def XVSE_V : RVV0p71VSx<0b000, 0b111, "vse.v">;
 
 // Vector Strided Instructions
-def XVLSB_V : RVV0p71VLSx<0b000, "vlsb.v">;
-def XVLSH_V : RVV0p71VLSx<0b101, "vlsh.v">;
-def XVLSW_V : RVV0p71VLSx<0b110, "vlsw.v">;
-def XVLSBU_V : RVV0p71VLSxU<0b000, "vlsbu.v">;
-def XVLSHU_V : RVV0p71VLSxU<0b101, "vlshu.v">;
-def XVLSWU_V : RVV0p71VLSxU<0b110, "vlswu.v">;
-def XVLSE_V : RVV0p71VLSxU<0b111, "vlse.v">;
-def XVSSB_V : RVV0p71VSSx<0b000, "vssb.v">;
-def XVSSH_V : RVV0p71VSSx<0b101, "vssh.v">;
-def XVSSW_V : RVV0p71VSSx<0b110, "vssw.v">;
-def XVSSE_V : RVV0p71VSSx<0b111, "vsse.v">;
+def XVLSB_V : RVV0p71VLSx<0b000, 0b000, "vlsb.v">;
+def XVLSH_V : RVV0p71VLSx<0b000, 0b101, "vlsh.v">;
+def XVLSW_V : RVV0p71VLSx<0b000, 0b110, "vlsw.v">;
+def XVLSBU_V : RVV0p71VLSxU<0b000, 0b000, "vlsbu.v">;
+def XVLSHU_V : RVV0p71VLSxU<0b000, 0b101, "vlshu.v">;
+def XVLSWU_V : RVV0p71VLSxU<0b000, 0b110, "vlswu.v">;
+def XVLSE_V : RVV0p71VLSxU<0b000, 0b111, "vlse.v">;
+def XVSSB_V : RVV0p71VSSx<0b000, 0b000, "vssb.v">;
+def XVSSH_V : RVV0p71VSSx<0b000, 0b101, "vssh.v">;
+def XVSSW_V : RVV0p71VSSx<0b000, 0b110, "vssw.v">;
+def XVSSE_V : RVV0p71VSSx<0b000, 0b111, "vsse.v">;
 
 // Vector indexed loads and stores
-def XVLXB_V : RVV0p71VLXx<0b000, "vlxb.v">;
-def XVLXH_V : RVV0p71VLXx<0b101, "vlxh.v">;
-def XVLXW_V : RVV0p71VLXx<0b110, "vlxw.v">;
-def XVLXBU_V : RVV0p71VLXxU<0b000, "vlxbu.v">;
-def XVLXHU_V : RVV0p71VLXxU<0b101, "vlxhu.v">;
-def XVLXWU_V : RVV0p71VLXxU<0b110, "vlxwu.v">;
-def XVLXE_V : RVV0p71VLXxU<0b111, "vlxe.v">;
-def XVSXB_V : RVV0p71VSXx<0b000, "vsxb.v">;
-def XVSXH_V : RVV0p71VSXx<0b101, "vsxh.v">;
-def XVSXW_V : RVV0p71VSXx<0b110, "vsxw.v">;
-def XVSXE_V : RVV0p71VSXx<0b111, "vsxe.v">;
-def XVSUXB_V : RVV0p71VSUXx<0b000, "vsuxb.v">;
-def XVSUXH_V : RVV0p71VSUXx<0b101, "vsuxh.v">;
-def XVSUXW_V : RVV0p71VSUXx<0b110, "vsuxw.v">;
-def XVSUXE_V : RVV0p71VSUXx<0b111, "vsuxe.v">;
+def XVLXB_V : RVV0p71VLXx<0b000, 0b000, "vlxb.v">;
+def XVLXH_V : RVV0p71VLXx<0b000, 0b101, "vlxh.v">;
+def XVLXW_V : RVV0p71VLXx<0b000, 0b110, "vlxw.v">;
+def XVLXBU_V : RVV0p71VLXxU<0b000, 0b000, "vlxbu.v">;
+def XVLXHU_V : RVV0p71VLXxU<0b000, 0b101, "vlxhu.v">;
+def XVLXWU_V : RVV0p71VLXxU<0b000, 0b110, "vlxwu.v">;
+def XVLXE_V : RVV0p71VLXxU<0b000, 0b111, "vlxe.v">;
+def XVSXB_V : RVV0p71VSXx<0b000, 0b000, "vsxb.v">;
+def XVSXH_V : RVV0p71VSXx<0b000, 0b101, "vsxh.v">;
+def XVSXW_V : RVV0p71VSXx<0b000, 0b110, "vsxw.v">;
+def XVSXE_V : RVV0p71VSXx<0b000, 0b111, "vsxe.v">;
+def XVSUXB_V : RVV0p71VSUXx<0b000, 0b000, "vsuxb.v">;
+def XVSUXH_V : RVV0p71VSUXx<0b000, 0b101, "vsuxh.v">;
+def XVSUXW_V : RVV0p71VSUXx<0b000, 0b110, "vsuxw.v">;
+def XVSUXE_V : RVV0p71VSUXx<0b000, 0b111, "vsuxe.v">;
 
 // Unit-stride Fault-Only-First Loads
-def XVLBFF_V : RVV0p71VLxFF<0b000, "vlbff.v">;
-def XVLHFF_V : RVV0p71VLxFF<0b101, "vlhff.v">;
-def XVLWFF_V : RVV0p71VLxFF<0b110, "vlwff.v">;
-def XVLBUFF_V : RVV0p71VLxUFF<0b000, "vlbuff.v">;
-def XVLHUFF_V : RVV0p71VLxUFF<0b101, "vlhuff.v">;
-def XVLWUFF_V : RVV0p71VLxUFF<0b110, "vlwuff.v">;
-def XVLEFF_V : RVV0p71VLxUFF<0b111, "vleff.v">;
+def XVLBFF_V : RVV0p71VLxFF<0b000, 0b000, "vlbff.v">;
+def XVLHFF_V : RVV0p71VLxFF<0b000, 0b101, "vlhff.v">;
+def XVLWFF_V : RVV0p71VLxFF<0b000, 0b110, "vlwff.v">;
+def XVLBUFF_V : RVV0p71VLxUFF<0b000, 0b000, "vlbuff.v">;
+def XVLHUFF_V : RVV0p71VLxUFF<0b000, 0b101, "vlhuff.v">;
+def XVLWUFF_V : RVV0p71VLxUFF<0b000, 0b110, "vlwuff.v">;
+def XVLEFF_V : RVV0p71VLxUFF<0b000, 0b111, "vleff.v">;
+} // Predicates = [HasRVV0p71]
 
+let Predicates = [HasRVV0p71, HasXvlsseg] in {
+foreach nf=2-8 in {
+  // Vector Unit-Stride Segment Loads and Stores
+  def XVLSEG#nf#B_V : RVV0p71VLx<!add(nf, -1), 0b000, "vlseg"#nf#"b.v">;
+  def XVLSEG#nf#H_V : RVV0p71VLx<!add(nf, -1), 0b101, "vlseg"#nf#"h.v">;
+  def XVLSEG#nf#W_V : RVV0p71VLx<!add(nf, -1), 0b110, "vlseg"#nf#"w.v">;
+  def XVLSEG#nf#BU_V : RVV0p71VLxU<!add(nf, -1), 0b000, "vlseg"#nf#"bu.v">;
+  def XVLSEG#nf#HU_V : RVV0p71VLxU<!add(nf, -1), 0b101, "vlseg"#nf#"hu.v">;
+  def XVLSEG#nf#WU_V : RVV0p71VLxU<!add(nf, -1), 0b110, "vlseg"#nf#"wu.v">;
+  def XVLSEG#nf#E_V : RVV0p71VLxU<!add(nf, -1), 0b111, "vlseg"#nf#"e.v">;
+  def XVSSEG#nf#B_V : RVV0p71VSx<!add(nf, -1), 0b000, "vsseg"#nf#"b.v">;
+  def XVSSEG#nf#H_V : RVV0p71VSx<!add(nf, -1), 0b101, "vsseg"#nf#"h.v">;
+  def XVSSEG#nf#W_V : RVV0p71VSx<!add(nf, -1), 0b110, "vsseg"#nf#"w.v">;
+  def XVSSEG#nf#E_V : RVV0p71VSx<!add(nf, -1), 0b111, "vsseg"#nf#"e.v">;
+  def XVLSEG#nf#BFF_V : RVV0p71VLxFF<!add(nf, -1), 0b000, "vlseg"#nf#"bff.v">;
+  def XVLSEG#nf#HFF_V : RVV0p71VLxFF<!add(nf, -1), 0b101, "vlseg"#nf#"hff.v">;
+  def XVLSEG#nf#WFF_V : RVV0p71VLxFF<!add(nf, -1), 0b110, "vlseg"#nf#"wff.v">;
+  def XVLSEG#nf#BUFF_V : RVV0p71VLxUFF<!add(nf, -1), 0b000, "vlseg"#nf#"buff.v">;
+  def XVLSEG#nf#HUFF_V : RVV0p71VLxUFF<!add(nf, -1), 0b101, "vlseg"#nf#"huff.v">;
+  def XVLSEG#nf#WUFF_V : RVV0p71VLxUFF<!add(nf, -1), 0b110, "vlseg"#nf#"wuff.v">;
+  def XVLSEG#nf#EFF_V : RVV0p71VLxUFF<!add(nf, -1), 0b111, "vlseg"#nf#"eff.v">;
+
+  // Vector Strided Segment Loads and Stores
+  def XVLSSEG#nf#B_V : RVV0p71VLSx<!add(nf, -1), 0b000, "vlsseg"#nf#"b.v">;
+  def XVLSSEG#nf#H_V : RVV0p71VLSx<!add(nf, -1), 0b101, "vlsseg"#nf#"h.v">;
+  def XVLSSEG#nf#W_V : RVV0p71VLSx<!add(nf, -1), 0b110, "vlsseg"#nf#"w.v">;
+  def XVLSSEG#nf#BU_V : RVV0p71VLSxU<!add(nf, -1), 0b000, "vlsseg"#nf#"bu.v">;
+  def XVLSSEG#nf#HU_V : RVV0p71VLSxU<!add(nf, -1), 0b101, "vlsseg"#nf#"hu.v">;
+  def XVLSSEG#nf#WU_V : RVV0p71VLSxU<!add(nf, -1), 0b110, "vlsseg"#nf#"wu.v">;
+  def XVLSSEG#nf#E_V : RVV0p71VLSxU<!add(nf, -1), 0b111, "vlsseg"#nf#"e.v">;
+  def XVSSSEG#nf#B_V : RVV0p71VSSx<!add(nf, -1), 0b000, "vssseg"#nf#"b.v">;
+  def XVSSSEG#nf#H_V : RVV0p71VSSx<!add(nf, -1), 0b101, "vssseg"#nf#"h.v">;
+  def XVSSSEG#nf#W_V : RVV0p71VSSx<!add(nf, -1), 0b110, "vssseg"#nf#"w.v">;
+  def XVSSSEG#nf#E_V : RVV0p71VSSx<!add(nf, -1), 0b111, "vssseg"#nf#"e.v">;
+
+  // Vector Indexed Segment Loads and Stores
+  def XVLXSEG#nf#B_V : RVV0p71VLXx<!add(nf, -1), 0b000, "vlxseg"#nf#"b.v">;
+  def XVLXSEG#nf#H_V : RVV0p71VLXx<!add(nf, -1), 0b101, "vlxseg"#nf#"h.v">;
+  def XVLXSEG#nf#W_V : RVV0p71VLXx<!add(nf, -1), 0b110, "vlxseg"#nf#"w.v">;
+  def XVLXSEG#nf#BU_V : RVV0p71VLXxU<!add(nf, -1), 0b000, "vlxseg"#nf#"bu.v">;
+  def XVLXSEG#nf#HU_V : RVV0p71VLXxU<!add(nf, -1), 0b101, "vlxseg"#nf#"hu.v">;
+  def XVLXSEG#nf#WU_V : RVV0p71VLXxU<!add(nf, -1), 0b110, "vlxseg"#nf#"wu.v">;
+  def XVLXSEG#nf#E_V : RVV0p71VLXxU<!add(nf, -1), 0b111, "vlxseg"#nf#"e.v">;
+  def XVSXSEG#nf#B_V : RVV0p71VSXx<!add(nf, -1), 0b000, "vsxseg"#nf#"b.v">;
+  def XVSXSEG#nf#H_V : RVV0p71VSXx<!add(nf, -1), 0b101, "vsxseg"#nf#"h.v">;
+  def XVSXSEG#nf#W_V : RVV0p71VSXx<!add(nf, -1), 0b110, "vsxseg"#nf#"w.v">;
+  def XVSXSEG#nf#E_V : RVV0p71VSXx<!add(nf, -1), 0b111, "vsxseg"#nf#"e.v">;
+}
+} // Predicates = [HasRVV0p71, HasXvlsseg]
+
+let Predicates = [HasRVV0p71] in {
 // Vector Single-Width Integer Add and Subtract
 defm XVADD_V : VALU_IV_V_X_I<"vadd", 0b000000>;
 defm XVSUB_V : VALU_IV_V_X<"vsub", 0b000010>;
