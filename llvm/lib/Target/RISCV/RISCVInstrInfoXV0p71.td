@@ -316,8 +316,8 @@ defm XVSRA_V : VSHT_IV_V_X_I<"vsra", 0b101001, uimm5>;
 // vector register group (specified by vs2). The destination vector register
 // group cannot overlap the mask register if used, unless LMUL=1.
 let Constraints = "@earlyclobber $vd" in {
-defm XVNSRL_W : VNSHT_IV_V_X_I<"vnsrl", 0b101100, uimm5, "w">;
-defm XVNSRA_W : VNSHT_IV_V_X_I<"vnsra", 0b101101, uimm5, "w">;
+defm XVNSRL_W : VNSHT_IV_V_X_I<"vnsrl", 0b101100, uimm5>;
+defm XVNSRA_W : VNSHT_IV_V_X_I<"vnsra", 0b101101, uimm5>;
 } // Constraints = "@earlyclobber $vd"
 
 // Vector Integer Comparison Instructions
@@ -418,8 +418,8 @@ defm XVSSRA_V : VSSHF_IV_V_X_I<"vssra", 0b101011, uimm5>;
 
 // Vector Narrowing Fixed-Point Clip Instructions
 let Constraints = "@earlyclobber $vd" in {
-defm XVNCLIPU_W : VNCLP_IV_V_X_I<"vnclipu", 0b101110, uimm5, "w">;
-defm XVNCLIP_W : VNCLP_IV_V_X_I<"vnclip", 0b101111, uimm5, "w">;
+defm XVNCLIPU_W : VNCLP_IV_V_X_I<"vnclipu", 0b101110, uimm5>;
+defm XVNCLIP_W : VNCLP_IV_V_X_I<"vnclip", 0b101111, uimm5>;
 } // Constraints = "@earlyclobber $vd"
 } // Predicates = [HasRVV0p71]
 

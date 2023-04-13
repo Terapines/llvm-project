@@ -116,82 +116,82 @@ vsra.vi v8, v4, 31
 # CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
 # CHECK-UNKNOWN: 57 b4 4f a6 <unknown>
 
-vnsrl.wv v8, v4, v20, v0.t
-# CHECK-INST: vnsrl.wv v8, v4, v20, v0.t
+vnsrl.vv v8, v4, v20, v0.t
+# CHECK-INST: vnsrl.vv v8, v4, v20, v0.t
 # CHECK-ENCODING: [0x57,0x04,0x4a,0xb0]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 04 4a b0 <unknown>
 
-vnsrl.wv v4, v4, v20, v0.t
-# CHECK-INST: vnsrl.wv v4, v4, v20, v0.t
+vnsrl.vv v4, v4, v20, v0.t
+# CHECK-INST: vnsrl.vv v4, v4, v20, v0.t
 # CHECK-ENCODING: [0x57,0x02,0x4a,0xb0]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 02 4a b0 <unknown>
 
-vnsrl.wv v8, v4, v20
-# CHECK-INST: vnsrl.wv v8, v4, v20
+vnsrl.vv v8, v4, v20
+# CHECK-INST: vnsrl.vv v8, v4, v20
 # CHECK-ENCODING: [0x57,0x04,0x4a,0xb2]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 04 4a b2 <unknown>
 
-vnsrl.wx v8, v4, a0, v0.t
-# CHECK-INST: vnsrl.wx v8, v4, a0, v0.t
+vnsrl.vx v8, v4, a0, v0.t
+# CHECK-INST: vnsrl.vx v8, v4, a0, v0.t
 # CHECK-ENCODING: [0x57,0x44,0x45,0xb0]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 44 45 b0 <unknown>
 
-vnsrl.wx v8, v4, a0
-# CHECK-INST: vnsrl.wx v8, v4, a0
+vnsrl.vx v8, v4, a0
+# CHECK-INST: vnsrl.vx v8, v4, a0
 # CHECK-ENCODING: [0x57,0x44,0x45,0xb2]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 44 45 b2 <unknown>
 
-vnsrl.wi v8, v4, 31, v0.t
-# CHECK-INST: vnsrl.wi v8, v4, 31, v0.t
+vnsrl.vi v8, v4, 31, v0.t
+# CHECK-INST: vnsrl.vi v8, v4, 31, v0.t
 # CHECK-ENCODING: [0x57,0xb4,0x4f,0xb0]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 b4 4f b0 <unknown>
 
-vnsrl.wi v8, v4, 31
-# CHECK-INST: vnsrl.wi v8, v4, 31
+vnsrl.vi v8, v4, 31
+# CHECK-INST: vnsrl.vi v8, v4, 31
 # CHECK-ENCODING: [0x57,0xb4,0x4f,0xb2]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 b4 4f b2 <unknown>
 
-vnsra.wv v8, v4, v20, v0.t
-# CHECK-INST: vnsra.wv v8, v4, v20, v0.t
+vnsra.vv v8, v4, v20, v0.t
+# CHECK-INST: vnsra.vv v8, v4, v20, v0.t
 # CHECK-ENCODING: [0x57,0x04,0x4a,0xb4]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 04 4a b4 <unknown>
 
-vnsra.wv v8, v4, v20
-# CHECK-INST: vnsra.wv v8, v4, v20
+vnsra.vv v8, v4, v20
+# CHECK-INST: vnsra.vv v8, v4, v20
 # CHECK-ENCODING: [0x57,0x04,0x4a,0xb6]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 04 4a b6 <unknown>
 
-vnsra.wx v8, v4, a0, v0.t
-# CHECK-INST: vnsra.wx v8, v4, a0, v0.t
+vnsra.vx v8, v4, a0, v0.t
+# CHECK-INST: vnsra.vx v8, v4, a0, v0.t
 # CHECK-ENCODING: [0x57,0x44,0x45,0xb4]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 44 45 b4 <unknown>
 
-vnsra.wx v8, v4, a0
-# CHECK-INST: vnsra.wx v8, v4, a0
+vnsra.vx v8, v4, a0
+# CHECK-INST: vnsra.vx v8, v4, a0
 # CHECK-ENCODING: [0x57,0x44,0x45,0xb6]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 44 45 b6 <unknown>
 
-vnsra.wi v8, v4, 31, v0.t
-# CHECK-INST: vnsra.wi v8, v4, 31, v0.t
+vnsra.vi v8, v4, 31, v0.t
+# CHECK-INST: vnsra.vi v8, v4, 31, v0.t
 # CHECK-ENCODING: [0x57,0xb4,0x4f,0xb4]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 b4 4f b4 <unknown>
 
-vnsra.wi v8, v4, 31
-# CHECK-INST: vnsra.wi v8, v4, 31
+vnsra.vi v8, v4, 31
+# CHECK-INST: vnsra.vi v8, v4, 31
 # CHECK-ENCODING: [0x57,0xb4,0x4f,0xb6]
-# CHECK-ERROR: instruction requires the following: 'V' (Vector Extension for Application Processors), 'Zve32x' or 'Zve64x' (Vector Extensions for Embedded Processors){{$}}
+# CHECK-ERROR: unrecognized instruction mnemonic
 # CHECK-UNKNOWN: 57 b4 4f b6 <unknown>
 
 vssrl.vv v8, v4, v20, v0.t
