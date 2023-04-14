@@ -264,7 +264,7 @@ enum OperandType : unsigned {
   OPERAND_CLUI_IMM,
   OPERAND_VTYPEI10,
   OPERAND_VTYPEI11,
-  OPERAND_VTYPEI0p71,
+  OPERAND_XVTYPEI,
   OPERAND_RVKRNUM,
   OPERAND_LAST_RISCV_IMM = OPERAND_RVKRNUM,
   // Operand is either a register or uimm5, this is used by V extension pseudo
@@ -442,7 +442,7 @@ inline static bool isValidEDIV(unsigned EDIV) {
 unsigned encodeVTYPE(RISCVII::VLMUL VLMUL, unsigned SEW, bool TailAgnostic,
                      bool MaskAgnostic);
 
-unsigned encodeVTYPE0p71(unsigned SEW, unsigned LMUL, unsigned EDIV);
+unsigned encodeXVTYPE(unsigned SEW, unsigned LMUL, unsigned EDIV);
 
 inline static RISCVII::VLMUL getVLMUL(unsigned VType) {
   unsigned VLMUL = VType & 0x7;
@@ -484,7 +484,7 @@ inline static bool isMaskAgnostic(unsigned VType) { return VType & 0x80; }
 
 void printVType(unsigned VType, raw_ostream &OS);
 
-void printVType0p71(unsigned VType, raw_ostream &OS);
+void printXVType(unsigned VType, raw_ostream &OS);
 
 unsigned getSEWLMULRatio(unsigned SEW, RISCVII::VLMUL VLMul);
 

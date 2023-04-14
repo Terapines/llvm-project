@@ -179,8 +179,9 @@ void RISCVInstPrinter::printVTypeI(const MCInst *MI, unsigned OpNo,
   RISCVVType::printVType(Imm, O);
 }
 
-void RISCVInstPrinter::printVTypeI0p71(const MCInst *MI, unsigned OpNo,
-                                   const MCSubtargetInfo &STI, raw_ostream &O) {
+void RISCVInstPrinter::printXVTYPEI(const MCInst *MI, unsigned OpNo,
+                                    const MCSubtargetInfo &STI,
+                                    raw_ostream &O) {
   unsigned Imm = MI->getOperand(OpNo).getImm();
   unsigned VSEW = (Imm >> 2) & 0x7;
   // Print the raw immediate for reserved values: vsew[2:0]=0b1xx,
@@ -190,7 +191,7 @@ void RISCVInstPrinter::printVTypeI0p71(const MCInst *MI, unsigned OpNo,
     return;
   }
   // Print the text form.
-  RISCVVType::printVType0p71(Imm, O);
+  RISCVVType::printXVType(Imm, O);
 }
 
 void RISCVInstPrinter::printVMaskReg(const MCInst *MI, unsigned OpNo,
