@@ -120,15 +120,94 @@ struct ForOpRewrite : public OpRewritePattern<scf::ForOp> {
   }
 };
 
+struct AffineExprRewrite : public RewritePattern {
+  AffineExprRewrite(MLIRContext *context, PatternBenefit benefit = 1)
+      : RewritePattern(Pattern::MatchAnyOpTypeTag(), benefit, context) {}
+
+  std::optional<mlir::AffineExpr>
+  toAffineExpr(Value value, SmallVectorImpl<Value> &mapOperands) const {
+    auto ctx = value.getContext();
+    if (affine::isValidDim(value)) {
+      auto expr = getAffineDimExpr(mapOperands.size(), ctx);
+      mapOperands.push_back(value);
+      return expr;
+    }
+
+    if (auto ofi =
+            value.getDefiningOp<arith::ArithIntegerOverflowFlagsInterface>())
+      if (!value.getType().isIndex() && !ofi.hasNoSignedWrap())
+        return std::nullopt;
+
+    IntegerAttr constAttr;
+    Value x, y;
+
+    if (matchPattern(value, m_Constant(&constAttr)))
+      return getAffineConstantExpr(constAttr.getInt(), ctx);
+    else if (matchPattern(value, m_Op<arith::IndexCastOp>(matchers::m_Any(&x))))
+      return toAffineExpr(x, mapOperands);
+    else if (matchPattern(value, m_Op<arith::AddIOp>(matchers::m_Any(&x),
+                                                     matchers::m_Any(&y)))) {
+      auto lhsExpr = toAffineExpr(x, mapOperands);
+      auto rhsExpr = toAffineExpr(y, mapOperands);
+
+      if (lhsExpr && rhsExpr)
+        return *lhsExpr + *rhsExpr;
+
+      return std::nullopt;
+    } else if (matchPattern(value, m_Op<arith::SubIOp>(matchers::m_Any(&x),
+                                                       matchers::m_Any(&y)))) {
+      auto lhsExpr = toAffineExpr(x, mapOperands);
+      auto rhsExpr = toAffineExpr(y, mapOperands);
+
+      if (lhsExpr && rhsExpr)
+        return *lhsExpr - *rhsExpr;
+
+      return std::nullopt;
+    } else if (matchPattern(value, m_Op<arith::MulIOp>(matchers::m_Any(&x),
+                                                       matchers::m_Any(&y)))) {
+      auto lhsExpr = toAffineExpr(x, mapOperands);
+      auto rhsExpr = toAffineExpr(y, mapOperands);
+
+      if (lhsExpr && rhsExpr)
+        return (*lhsExpr) * (*rhsExpr);
+
+      return std::nullopt;
+    }
+
+    return std::nullopt;
+  }
+
+  LogicalResult matchAndRewrite(Operation *op,
+                                PatternRewriter &rewriter) const override {
+    if (op->getNumResults() != 1)
+      return failure();
+
+    Value result = op->getResult(0);
+    if (affine::isValidDim(result) || !result.getType().isIndex())
+      return failure();
+
+    SmallVector<Value> mapOperands;
+    auto expr = toAffineExpr(result, mapOperands);
+
+    if (!expr)
+      return failure();
+
+    auto map = AffineMap::get(mapOperands.size(), 0, *expr);
+    rewriter.replaceOpWithNewOp<affine::AffineApplyOp>(op, map, mapOperands);
+    return success();
+  }
+};
+
 } // namespace
 
 void mlir::populateSCFToAffineConversionPatterns(RewritePatternSet &patterns) {
-  patterns.add<ForOpRewrite>(patterns.getContext());
+  patterns.add<ForOpRewrite, AffineExprRewrite>(patterns.getContext());
 }
 
 void SCFToAffinePass::runOnOperation() {
   MLIRContext &ctx = getContext();
   RewritePatternSet patterns(&ctx);
   populateSCFToAffineConversionPatterns(patterns);
-  walkAndApplyPatterns(getOperation(), std::move(patterns));
+  if (failed(applyPatternsGreedily(getOperation(), std::move(patterns))))
+    signalPassFailure();
 }
