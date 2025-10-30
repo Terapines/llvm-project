@@ -2740,14 +2740,14 @@ private:
 
         // The loop variable is a doLoop op argument.
         mlir::Type loopVarType = info.getLoopVariableType();
-        auto loopOp = fir::DoLoopOp::create(
-            *builder, loc, lowerValue, upperValue, stepValue,
-            /*unordered=*/false,
-            /*finalCountValue=*/false,
-            builder->createConvert(loc, loopVarType, lowerValue));
+        auto loopOp = fir::DoLoopOp::create(*builder, loc, lowerValue,
+                                            upperValue, stepValue,
+                                            /*unordered=*/false,
+                                            /*finalCountValue=*/true);
         info.loopOp = loopOp;
         builder->setInsertionPointToStart(loopOp.getBody());
-        mlir::Value loopValue = loopOp.getRegionIterArgs()[0];
+        mlir::Value loopValue =
+            builder->createConvert(loc, loopVarType, loopOp.getInductionVar());
 
         // Update the loop variable value in case it has non-index references.
         fir::StoreOp::create(*builder, loc, loopValue, info.loopVariable);
@@ -2897,17 +2897,17 @@ private:
         builder->setInsertionPointToEnd(doLoopOp.getBody());
         // Step loopVariable to help optimizations such as vectorization.
         // Induction variable elimination will clean up as necessary.
-        mlir::Value step = builder->createConvert(
-            loc, info.getLoopVariableType(), doLoopOp.getStep());
         mlir::Value loopVar =
             fir::LoadOp::create(*builder, loc, info.loopVariable);
-        mlir::Value loopVarInc =
-            mlir::arith::AddIOp::create(*builder, loc, loopVar, step, iofAttr);
+        loopVar = builder->createConvert(loc, builder->getIndexType(), loopVar);
+        mlir::Value loopVarInc = mlir::arith::AddIOp::create(
+            *builder, loc, loopVar, doLoopOp.getStep(), iofAttr);
         fir::ResultOp::create(*builder, loc, loopVarInc);
         builder->setInsertionPointAfter(doLoopOp);
         // The loop control variable may be used after the loop.
-        fir::StoreOp::create(*builder, loc, doLoopOp.getResult(0),
-                             info.loopVariable);
+        mlir::Value finalValue = builder->createConvert(
+            loc, info.getLoopVariableType(), doLoopOp.getResult(0));
+        fir::StoreOp::create(*builder, loc, finalValue, info.loopVariable);
         continue;
       }
 
