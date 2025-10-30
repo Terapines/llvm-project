@@ -1114,8 +1114,12 @@ def RaiseSCFToAffinePass : Pass<"raise-scf-to-affine"> {
 def SCFToControlFlowPass : Pass<"convert-scf-to-cf"> {
   let summary = "Convert SCF dialect to ControlFlow dialect, replacing structured"
                 " control flow with a CFG";
-  let dependentDialects = ["cf::ControlFlowDialect"];
+  let dependentDialects = ["cf::ControlFlowDialect", "LLVM::LLVMDialect"];
   let options = [
+    Option<"enableVectorizeHints", "enable-vectorize-hints", "bool",
+            /*default=*/"false",
+            "Add vectorization hints when convert SCF parallel loop to "
+            "ControlFlow dialect">,
     Option<"allowPatternRollback", "allow-pattern-rollback", "bool", "true",
            "Experimental performance flag to disallow pattern rollback">
   ];
