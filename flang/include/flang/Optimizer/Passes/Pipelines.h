@@ -19,9 +19,13 @@
 #include "flang/Optimizer/Transforms/Passes.h"
 #include "flang/Tools/CrossToolHelpers.h"
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
+#include "mlir/Conversion/ControlFlowToSCF/ControlFlowToSCF.h"
+#include "mlir/Conversion/ConvertToLLVM/ToLLVMPass.h"
 #include "mlir/Conversion/MemRefToLLVM/MemRefToLLVM.h"
 #include "mlir/Conversion/ReconcileUnrealizedCasts/ReconcileUnrealizedCasts.h"
+#include "mlir/Conversion/SCFToAffine/SCFToAffine.h"
 #include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
+#include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/LLVMIR/LLVMAttrs.h"
 #include "mlir/Dialect/MemRef/Transforms/Passes.h"
@@ -184,5 +188,11 @@ void createMLIRToLLVMPassPipeline(mlir::PassManager &pm,
 #endif
 
 } // namespace fir
+
+namespace mlir {
+namespace test {
+std::unique_ptr<Pass> createTestSCFUpliftWhileToFor();
+}
+} // namespace mlir
 
 #endif // FORTRAN_OPTIMIZER_PASSES_PIPELINES_H

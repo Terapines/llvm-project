@@ -125,16 +125,28 @@ void addFIRToCoreMLIRToLLVMPass(mlir::PassManager &pm,
   pm.addPass(mlir::memref::createFoldMemRefAliasOpsPass());
 
   if (config.OptLevel.isOptimizingForSpeed()) {
-    pm.addPass(mlir::createMem2Reg());
     pm.addPass(mlir::createCSEPass());
     pm.addPass(mlir::createCanonicalizerPass());
+    pm.addPass(mlir::createMem2Reg());
+    pm.addPass(mlir::createLiftControlFlowToSCFPass());
+    pm.addPass(mlir::createCSEPass());
+    pm.addPass(mlir::createCanonicalizerPass());
+    pm.addPass(mlir::test::createTestSCFUpliftWhileToFor());
+    pm.addPass(mlir::createLoopInvariantCodeMotionPass());
+    pm.addPass(mlir::createCSEPass());
+    pm.addPass(mlir::createCanonicalizerPass());
+    pm.addPass(mlir::createRaiseSCFToAffinePass());
+    pm.addPass(mlir::affine::createRaiseMemrefToAffine());
+    pm.addPass(mlir::affine::createAffineParallelize());
   }
 
-  pm.addPass(mlir::memref::createExpandOpsPass());
   pm.addPass(mlir::memref::createExpandStridedMetadataPass());
   pm.addPass(mlir::createLowerAffinePass());
-  pm.addPass(mlir::createFinalizeMemRefToLLVMConversionPass());
-  pm.addPass(fir::createFIRToLLVMPass(options));
+  pm.addPass(mlir::memref::createExpandOpsPass());
+  mlir::SCFToControlFlowPassOptions scfToControlFlowOption;
+  scfToControlFlowOption.enableVectorizeHints = true;
+  pm.addPass(mlir::createSCFToControlFlowPass(scfToControlFlowOption));
+  pm.addPass(fir::createCoreMLIRToLLVMPass(options));
   pm.addPass(mlir::createReconcileUnrealizedCastsPass());
 }
 
@@ -258,8 +270,12 @@ void createDefaultFIROptimizerPassPipeline(mlir::PassManager &pm,
 
   addNestedPassToAllTopLevelOperations<PassConstructor>(
       pm, fir::createStackReclaim);
+
   // convert control flow to CFG form
-  fir::addCfgConversionPass(pm, pc);
+  if (pc.LowerThroughCoreMLIR)
+    pm.addPass(fir::createFIRToSCFPass());
+  else
+    fir::addCfgConversionPass(pm, pc);
   pm.addPass(mlir::createSCFToControlFlowPass());
 
   pm.addPass(mlir::createCanonicalizerPass(config));

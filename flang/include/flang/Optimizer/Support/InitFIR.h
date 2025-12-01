@@ -20,6 +20,7 @@
 #include "flang/Optimizer/HLFIR/HLFIRDialect.h"
 #include "flang/Optimizer/OpenACC/Support/RegisterOpenACCExtensions.h"
 #include "flang/Optimizer/OpenMP/Support/RegisterOpenMPExtensions.h"
+#include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/Passes.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Affine/Passes.h"
@@ -38,6 +39,7 @@
 #include "mlir/Dialect/OpenACC/Transforms/Passes.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Dialect/SCF/Transforms/Passes.h"
+#include "mlir/Dialect/UB/IR/UBOps.h"
 #include "mlir/InitAllDialects.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassRegistry.h"
@@ -57,7 +59,8 @@ namespace fir::support {
       mlir::index::IndexDialect, mif::MIFDialect
 
 #define FLANG_CODEGEN_DIALECT_LIST                                             \
-  FIRCodeGenDialect, mlir::memref::MemRefDialect, mlir::LLVM::LLVMDialect
+  FIRCodeGenDialect, mlir::memref::MemRefDialect, mlir::ub::UBDialect,         \
+      mlir::LLVM::LLVMDialect
 
 // The definitive list of dialects used by flang.
 #define FLANG_DIALECT_LIST                                                     \
@@ -75,6 +78,21 @@ inline void registerDialects(mlir::DialectRegistry &registry) {
   registry.insert<FLANG_CODEGEN_DIALECT_LIST>();
 }
 
+// Register convert to LLVM Extensions
+inline void addConvertToLLVMExtensions(mlir::DialectRegistry &registry) {
+  mlir::arith::registerConvertArithToLLVMInterface(registry);
+  mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
+  mlir::registerConvertComplexToLLVMInterface(registry);
+  mlir::registerConvertFuncToLLVMInterface(registry);
+  mlir::index::registerConvertIndexToLLVMInterface(registry);
+  mlir::registerConvertMathToLLVMInterface(registry);
+  mlir::registerConvertMemRefToLLVMInterface(registry);
+  mlir::registerConvertNVVMToLLVMInterface(registry);
+  mlir::registerConvertOpenMPToLLVMInterface(registry);
+  mlir::ub::registerConvertUBToLLVMInterface(registry);
+  mlir::vector::registerConvertVectorToLLVMInterface(registry);
+}
+
 // Register FIR Extensions
 inline void addFIRExtensions(mlir::DialectRegistry &registry,
                              bool addFIRInlinerInterface = true) {
@@ -84,6 +102,7 @@ inline void addFIRExtensions(mlir::DialectRegistry &registry,
   cuf::registerCUFDialectTranslation(registry);
   fir::acc::registerOpenACCExtensions(registry);
   fir::omp::registerOpenMPExtensions(registry);
+  addConvertToLLVMExtensions(registry);
 }
 
 inline void loadNonCodegenDialects(mlir::MLIRContext &context) {

@@ -46,5 +46,8 @@ namespace test {
 void registerTestSCFUpliftWhileToFor() {
   PassRegistration<TestSCFUpliftWhileToFor>();
 }
+std::unique_ptr<Pass> createTestSCFUpliftWhileToFor() {
+  return std::make_unique<TestSCFUpliftWhileToFor>();
+}
 } // namespace test
 } // namespace mlir
