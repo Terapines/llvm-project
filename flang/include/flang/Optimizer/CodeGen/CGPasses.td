@@ -16,6 +16,14 @@
 
 include "mlir/Pass/PassBase.td"
 
+def CoreMLIRToLLVM : Pass<"core-mlir-to-llvm", "mlir::ModuleOp"> {
+  let summary = "Convert core MLIR dialects produced from FIR to LLVM dialect";
+  let description = [{
+    Convert core MLIR dialects produced from FIR to LLVM dialect.
+  }];
+  let dependentDialects = ["mlir::LLVM::LLVMDialect", "mlir::DLTIDialect"];
+}
+
 def FIRToLLVMLowering : Pass<"fir-to-llvm-ir", "mlir::ModuleOp"> {
   let summary = "Convert FIR dialect to LLVM-IR dialect";
   let description = [{

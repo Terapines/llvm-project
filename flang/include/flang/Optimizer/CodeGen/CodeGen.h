@@ -23,6 +23,7 @@ class LLVMTypeConverter;
 
 struct NameUniquer;
 
+#define GEN_PASS_DECL_COREMLIRTOLLVM
 #define GEN_PASS_DECL_FIRTOLLVMLOWERING
 #define GEN_PASS_DECL_CODEGENREWRITE
 #define GEN_PASS_DECL_TARGETREWRITEPASS
@@ -71,6 +72,10 @@ std::unique_ptr<mlir::Pass> createFIRToLLVMPass();
 
 /// Convert FIR to the LLVM IR dialect
 std::unique_ptr<mlir::Pass> createFIRToLLVMPass(FIRToLLVMPassOptions options);
+
+// Convert core MLIR dialects produced from FIR to LLVM dialect
+std::unique_ptr<mlir::Pass>
+createCoreMLIRToLLVMPass(FIRToLLVMPassOptions options);
 
 using LLVMIRLoweringPrinter =
     std::function<void(llvm::Module &, llvm::raw_ostream &)>;

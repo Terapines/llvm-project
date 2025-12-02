@@ -2,6 +2,7 @@ add_flang_library(FIRCodeGen
   BoxedProcedure.cpp
   CodeGen.cpp
   CodeGenOpenMP.cpp
+  CoreMLIRToLLVM.cpp
   FIROpPatterns.cpp
   LLVMInsertChainFolder.cpp
   LowerRepackArrays.cpp
