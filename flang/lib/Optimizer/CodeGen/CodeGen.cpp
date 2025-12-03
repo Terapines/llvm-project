@@ -2312,6 +2312,17 @@ private:
                            /*lbounds*/ {}, inputExtents, inputStrides,
                            rewriter);
 
+    llvm::SmallVector<unsigned> scalarSliceDims;
+    if (rebox->hasAttr("scalar_slice_dims"))
+      scalarSliceDims = llvm::map_to_vector(
+          mlir::cast<mlir::ArrayAttr>(rebox->getAttr("scalar_slice_dims"))
+              .getValue(),
+          [](mlir::Attribute attr) -> unsigned {
+            return mlir::cast<mlir::IntegerAttr>(attr)
+                .getValue()
+                .getZExtValue();
+          });
+
     // The slice is of the form array(i:j:k)[%component]. Compute new extents
     // and strides.
     llvm::SmallVector<mlir::Value> slicedExtents;
@@ -2343,7 +2354,7 @@ private:
       mlir::Value upper = operands[sliceOps + 1];
       const bool isTripletSlice =
           !mlir::isa_and_nonnull<mlir::LLVM::UndefOp>(upper.getDefiningOp());
-      if (isTripletSlice) {
+      if (isTripletSlice && !llvm::is_contained(scalarSliceDims, i)) {
         mlir::Value step =
             integerCast(loc, rewriter, idxTy, operands[sliceOps + 2]);
         // extent = ub-lb+step/step

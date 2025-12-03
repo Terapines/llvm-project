@@ -529,6 +529,7 @@ public:
         // so the type parameters are not needed.
         firBaseTypeParameters.clear();
       }
+      mlir::SmallVector<int64_t> scalarSliceDims;
       llvm::SmallVector<mlir::Value> triples;
       llvm::SmallVector<mlir::Value> sliceFields;
       mlir::Type idxTy = builder.getIndexType();
@@ -556,12 +557,14 @@ public:
         // Otherwise, this is an array section with triplets.
         auto undef = fir::UndefOp::create(builder, loc, idxTy);
         unsigned i = 0;
-        for (auto isTriplet : designate.getIsTriplet()) {
+        for (auto [dim, isTriplet] :
+             llvm::enumerate(designate.getIsTriplet())) {
           triples.push_back(subscripts[i++]);
           if (isTriplet) {
             triples.push_back(subscripts[i++]);
             triples.push_back(subscripts[i++]);
           } else {
+            scalarSliceDims.push_back(dim);
             triples.push_back(undef);
             triples.push_back(undef);
           }
@@ -615,6 +618,11 @@ public:
         resultBox = fir::BoxAddrOp::create(rewriter, loc, resultBox);
         resultBox = builder.createConvert(loc, designateResultType, resultBox);
       }
+      if (!scalarSliceDims.empty())
+        if (auto reboxOp = resultBox.getDefiningOp<fir::ReboxOp>())
+          reboxOp->setAttr("scalar_slice_dims",
+                           rewriter.getIndexArrayAttr(scalarSliceDims));
+
       rewriter.replaceOp(designate, resultBox);
       return mlir::success();
     }

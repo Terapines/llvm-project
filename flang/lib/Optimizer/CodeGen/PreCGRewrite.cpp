@@ -206,6 +206,7 @@ public:
     auto xRebox = fir::cg::XReboxOp::create(
         rewriter, loc, rebox.getType(), rebox.getBox(), shapeOpers, shiftOpers,
         sliceOpers, subcompOpers, substrOpers);
+    xRebox->setAttrs(rebox->getAttrs());
     LLVM_DEBUG(llvm::dbgs()
                << "rewriting " << rebox << " to " << xRebox << '\n');
     rewriter.replaceOp(rebox, xRebox.getOperation()->getResults());
