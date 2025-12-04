@@ -175,10 +175,8 @@ struct LiftControlFlowToSCF
         for (Region &reg : innerOp->getRegions()) {
           FailureOr<bool> changedFunc =
               transformCFGToSCF(reg, transformation, domInfo);
-          if (failed(changedFunc))
-            return WalkResult::interrupt();
-
-          changed |= *changedFunc;
+          if (!failed(changedFunc))
+            changed |= *changedFunc;
         }
         return WalkResult::advance();
       };
